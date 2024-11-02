@@ -1,1 +1,1 @@
-print('test script')
+print(ord('а'), ord('я'))
