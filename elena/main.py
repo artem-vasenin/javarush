@@ -65,6 +65,7 @@ def check_letter(text, list_words):
             print(f'Вы проиграли. Было загаданно слово: "{words}"')
             exit=input("Нажмите Enter для выхода: ")
             if exit=="":
+                # ToDo: тут ты еще наерное хотела "покасик" зкавернуть в print?
                 "Пока"
                 return
 
