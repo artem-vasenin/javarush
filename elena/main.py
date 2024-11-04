@@ -52,7 +52,7 @@ def check_letter(text, list_words):
         print(list_words)
         letters_remain()
         letters = input(f"\nВведите букву, у Вас оталось {attempt} попыток:")
-        # ToDo: отступы между блоками условий и переменными
+
         if letters.lower() in letters_remains and letters.lower() in text:
             found_letter(letters, text, list_words)
         elif letters.lower() in letters_remains and letters.lower() not in text:
