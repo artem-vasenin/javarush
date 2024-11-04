@@ -43,7 +43,7 @@ def found_letter(letters, text, list_words):
         print(f"Вы выиграли! Было загадано слово: {words}")
         exit = input("Нажмите Enter для выхода: ")
         if exit=="":
-            "Пока"
+            print("Пока")
             return
 
 def check_letter(text, list_words):
@@ -65,7 +65,7 @@ def check_letter(text, list_words):
             print(f'Вы проиграли. Было загаданно слово: "{words}"')
             exit=input("Нажмите Enter для выхода: ")
             if exit=="":
-                "Пока"
+                print("Пока")
                 return
 
 def game(words):
