@@ -3,16 +3,23 @@ db = [
 ]
 mode = 'menu'
 
+def print_todos(lst):
+    print('='*100)
+    for i in range(len(lst)):
+        print(f'| ID: {lst[i]["id"]} | "{lst[i]['title']}" {"| (Завершена)" if lst[i]['isFinished'] else ""}')
+        if len(lst)-1 != i:
+            print('-'*100)
+    print('='*100)
+
 def get_todos():
-    print(*[f'ID: {e["id"]} - "{e['title']}" {"(Завершена)" if e['isFinished'] else ""}' for e in db] if db else 'Список пуст', sep='\n')
-    print('='*20)
+    print_todos(db)
 
 def add_todo():
     title = input('Введите заголовок: ')
     id = max([e["id"] for e in db]) + 1
     db.append({'id': int(id), 'title': title, 'isFinished': False})
     print('Запись успешно добавлена')
-    get_todos()
+    print_todos(db)
 
 def check_todo():
     id = int(input('Введите ID задачи которую хотите завершить: '))
@@ -20,7 +27,7 @@ def check_todo():
     if len(result):
         result[0]['isFinished'] = True
         print('Запись обновлена')
-        get_todos()
+        print_todos(db)
     else:
         print('Записи с таким ID в списке нет', end='\n\n')
 
@@ -30,12 +37,13 @@ def remove_todo():
     if id.isdigit() and int(id) in [e['id'] for e in db]:
         db = [e for e in db if e['id'] != int(id)]
         print(f'Запись с ID: {id} успешно удалена')
-        get_todos()
+        print_todos(db)
     else:
         print('Введен неверный ID или записи с таким ID в списке нет')
 
 def finish():
     global mode
+    print('============= Bye-bye! =============')
     mode = 'finished'
 
 settings = {
