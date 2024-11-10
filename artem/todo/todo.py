@@ -1,31 +1,51 @@
-db = [
-    {'id': 1, 'title': 'купить хлеб', 'isFinished': False},
-]
 mode = 'menu'
+db = []
+
+def load_db() -> None:
+    with open('db.txt') as f:
+        global db
+        db = []
+        for i in [x.strip() for x in f]:
+            line = i.split('|')
+            dct = {'id': int(line[0]), 'title': line[1], 'isFinished': bool(int(line[2]))}
+            db.append(dct)
+
+def save_in_db() -> None:
+    with open('db.txt', 'w') as f:
+        lst = []
+        for i in [x for x in db]:
+            lst.append(f'{i['id']}|{i['title']}|{int(i['isFinished'])}\n')
+        f.writelines(lst)
 
 def print_todos(lst):
     print('='*100)
-    for i in range(len(lst)):
-        print(f'| ID: {lst[i]["id"]} | "{lst[i]['title']}" {"| (Завершена)" if lst[i]['isFinished'] else ""}')
-        if len(lst)-1 != i:
-            print('-'*100)
+    if len(lst):
+        for i in range(len(lst)):
+            print(f'| ID: {lst[i]["id"]} | "{lst[i]['title']}" {"| (Завершена)" if lst[i]['isFinished'] else ""}')
+            if len(lst)-1 != i:
+                print('-'*100)
+    else:
+        print('Записей пока нет. Самое время добавить!')
     print('='*100)
 
 def get_todos():
+    load_db()
     print_todos(db)
 
 def add_todo():
     title = input('Введите заголовок: ')
-    id = max([e["id"] for e in db]) + 1
-    db.append({'id': int(id), 'title': title, 'isFinished': False})
+    idx = max([e["id"] for e in db]) + 1 if db else 1
+    db.append({'id': int(idx), 'title': title, 'isFinished': False})
+    save_in_db()
     print('Запись успешно добавлена')
     print_todos(db)
 
 def check_todo():
-    id = int(input('Введите ID задачи которую хотите завершить: '))
-    result = [e for e in db if e['id'] == id]
+    idx = int(input('Введите ID задачи которую хотите завершить: '))
+    result = [e for e in db if e['id'] == idx]
     if len(result):
         result[0]['isFinished'] = True
+        save_in_db()
         print('Запись обновлена')
         print_todos(db)
     else:
@@ -33,10 +53,11 @@ def check_todo():
 
 def remove_todo():
     global db
-    id = input()
-    if id.isdigit() and int(id) in [e['id'] for e in db]:
-        db = [e for e in db if e['id'] != int(id)]
-        print(f'Запись с ID: {id} успешно удалена')
+    idx = input()
+    if idx.isdigit() and int(idx) in [e['id'] for e in db]:
+        db = [e for e in db if e['id'] != int(idx)]
+        save_in_db()
+        print(f'Запись с ID: {idx} успешно удалена')
         print_todos(db)
     else:
         print('Введен неверный ID или записи с таким ID в списке нет')
