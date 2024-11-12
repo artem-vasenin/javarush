@@ -1,17 +1,21 @@
 import random
+# ToDo: одна тарока отбойка от импортов
 def generate_list_of_digits():
     """
     Функция генерирует список из цифр
     """
+    # ToDo: я б просто сделал return [i for i in range(10)] что не требует отдельной переменной и короче
     digits_list = []
     for i in range(10):
         digits_list.append(i)
     return digits_list
 
+# ToDo: фигаси длина названия функции) в лучших традициях именований java
 def generate_list_of_lowercase_english_letters():
     """
     Функция генерирует список из английских букв в нижнем регистре
     """
+    # ToDo: тут тоже можно упростить до return [chr(i) for i in range(97, 123)]
     lowercase_english_letters_list = []
     for ascii_code in range(97, 123):
         lowercase_english_letters_list.append(chr(ascii_code))
@@ -21,6 +25,7 @@ def generate_list_of_uppercase_english_letters():
     """
     Функция генерирует список из английских букв в верхнем регистре
     """
+    # ToDo: тут я бы просто взял список из функции выше и сделал return [i.upper() for i in lst]
     uppercase_english_letters_list = []
     for ascii_code in range(65, 91):
         uppercase_english_letters_list.append(chr(ascii_code))
@@ -31,6 +36,8 @@ def generate_list_of_special_symbols():
     Функция генерирует список из спецсимволов
     """
     special_symbols_list_ascii = list(range(33, 48)) + list(range(58, 65)) + list(range(91, 97)) + list(range(123, 127))
+    # ToDo: 4 однотипных функции - оно напрашивается на одну лишь универсальную функцию принимающую только итератор параметром
+    # ToDo: и может вторым необязательным параметром функцию обработчик элемента итерации, тут например chr
     special_symbols_list = []
     for ascii_code in special_symbols_list_ascii:
         special_symbols_list.append(chr(ascii_code))
@@ -40,6 +47,7 @@ def input_password_length():
     count = 0
     flag = True
     while flag:
+        # ToDo: 500 и 1000 я бы вынес в константы и подставлял их в условие и текст чтоб править в паре мест а не везде
         password_length = input("Выберите длину желаемого пароля, но не больше 500: ")
         if password_length.isdigit():
             flag = False #Пользователь ввел цифру
