@@ -55,7 +55,7 @@ def found_letter(letters, text, list_words):
     while letters.lower() in text:
         list_words[text.index(letters)] = letters
         text[text.index(letters)] = None
-    if "*" not in list_words:
+    if "_" not in list_words:
         print(f"Вы выиграли! Было загадано слово: {words}")
         exit_game = input("Нажмите Enter для выхода: ")
         if exit_game=="":
@@ -64,7 +64,7 @@ def found_letter(letters, text, list_words):
 
 def check_letter(text, list_words):
     global attempt
-    while attempt>0 and "*" in list_words:
+    while attempt>0 and "_" in list_words:
         gallows(attempt)
         print(list_words)
         letters_remain()
@@ -90,7 +90,7 @@ def check_letter(text, list_words):
 
 def game(words):
     text = list(words)
-    list_words = ["*" for _ in range(len(words))]
+    list_words = ["_" for _ in range(len(words))]
     check_letter(text, list_words)
 
 if __name__ == "__main__":
