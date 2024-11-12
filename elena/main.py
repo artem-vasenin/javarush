@@ -12,6 +12,22 @@ eight_letters = ["авимбуве", "детектив", "агенство"]
 list_letters = [five_letters, six_letters, seven_letters, eight_letters]
 dict_letters = {i+1:letter for i, letter in enumerate(list_letters)}
 
+def gallows(attempt):
+    if attempt == 0:
+        print("_______\n|     |\n|     0\n|    \\|/\n|     |\n|    / \\\n|")
+    elif attempt == 1:
+        print("_______\n|     |\n|     0\n|    \\|/\n|     |\n|    /\n|")
+    elif attempt == 2:
+        print("_______\n|     |\n|     0\n|    \\|/\n|     |\n|\n|")
+    elif attempt == 3:
+        print("_______\n|     |\n|     0\n|    \\| \n|     |\n|\n|")
+    elif attempt == 4:
+        print("_______\n|     |\n|     0\n|     |\n|     |\n|\n|")
+    elif attempt == 5:
+        print("_______\n|     |\n|     0\n|\n|\n|\n|")
+    elif attempt == 6:
+        print("_______\n|     |\n|\n|\n|\n|\n|")
+
 def level_selection():
     for index, value in enumerate(number_levels):
         print(f"{index+1}. {value}")
@@ -49,6 +65,7 @@ def found_letter(letters, text, list_words):
 def check_letter(text, list_words):
     global attempt
     while attempt>0 and "*" in list_words:
+        gallows(attempt)
         print(list_words)
         letters_remain()
         letters = input(f"\nВведите букву, у Вас оталось {attempt} попыток:")
@@ -62,6 +79,8 @@ def check_letter(text, list_words):
         else:
             print(f"Введити букву из списка")
         if attempt<=0:
+            gallows(attempt)
+            print()
             print(f'Вы проиграли. Было загаданно слово: "{words}"')
             exit=input("Нажмите Enter для выхода: ")
             if exit=="":
