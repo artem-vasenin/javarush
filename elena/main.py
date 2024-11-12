@@ -1,22 +1,38 @@
 from random import randrange
 
+
 attempt = 6
-letters_remains = [chr(x) for x in range(1072, 1104)]
+letters_remains = [chr(x) for x in range(1040, 1072)]
 words = None
 number_levels = ["Пять букв", "Шесть букв", "Семь букв", "Восемь букв"]
-five_letters = ["армия", "акула", "башня", "вафля", "газон", "гуашь"]
-six_letters = ["йогурт", "листья", "червяк", "яблоко", "биолог", "бизнес", "гвоздь"] # опечатка листья
-seven_letters = ["зеркало", "джекпот", "леопард", "подъезд", "дельфин"]
-eight_letters = ["авимбуве", "детектив", "агенство"]
+five_letters = ["АРМИЯ", "АКУЛА", "БАШНЯ", "ВАФЛЯ", "ГАЗОН", "ГУАШЬ"]
+six_letters = ["ЙОГУРТ", "ЛИСТЬЯ", "ЧЕРВЯК", "ЯБЛОКО", "БИОЛОГ", "БИЗНЕС", "ГВОЗДЬ"]
+seven_letters = ["ЗЕРКАЛО", "ДЖЕКПОТ", "ЛЕОПАРД", "ПОДЪЕЗД", "ДЕЛЬФИН"]
+eight_letters = ["ПРОСТУДА", "ДЕТЕКТИВ", "АГЕНСТВО", "ФУТБОЛКА"]
 list_letters = [five_letters, six_letters, seven_letters, eight_letters]
 dict_letters = {i+1:letter for i, letter in enumerate(list_letters)}
 
+def gallows(attempt):
+    if attempt == 0:
+        print("_______\n|     |\n|     0\n|    \\|/\n|     |\n|    / \\\n|")
+    elif attempt == 1:
+        print("_______\n|     |\n|     0\n|    \\|/\n|     |\n|    /\n|")
+    elif attempt == 2:
+        print("_______\n|     |\n|     0\n|    \\|/\n|     |\n|\n|")
+    elif attempt == 3:
+        print("_______\n|     |\n|     0\n|    \\| \n|     |\n|\n|")
+    elif attempt == 4:
+        print("_______\n|     |\n|     0\n|     |\n|     |\n|\n|")
+    elif attempt == 5:
+        print("_______\n|     |\n|     0\n|\n|\n|\n|")
+    elif attempt == 6:
+        print("_______\n|     |\n|\n|\n|\n|\n|")
+
 def level_selection():
-    '''Пользователь выбирает уровень'''
     for index, value in enumerate(number_levels):
         print(f"{index+1}. {value}")
     while True:
-        lvl = input(f"Выберите уровень от 1 до {len(number_levels)}: ")
+        lvl = input(f"Выбирите уровень от 1 до {len(number_levels)}: ")
         if lvl.isdigit() and 0<int(lvl)<=len(number_levels):
             return game_levels(lvl)
         else:
@@ -35,42 +51,46 @@ def letters_remain():
 
 def found_letter(letters, text, list_words):
     print(f"Вы угадали букву!")
-    letters_remains.remove(letters.lower())
-    while letters.lower() in text:
+    letters_remains.remove(letters.upper())
+    while letters.upper() in text:
         list_words[text.index(letters)] = letters
         text[text.index(letters)] = None
-    if "*" not in list_words:
+    if "_" not in list_words:
         print(f"Вы выиграли! Было загадано слово: {words}")
-        exit = input("Нажмите Enter для выхода: ")
-        if exit=="":
+        exit_game = input("Нажмите Enter для выхода: ")
+        if exit_game=="":
             print("Пока")
             return
 
 def check_letter(text, list_words):
     global attempt
-    while attempt>0 and "*" in list_words:
+    while attempt>0 and "_" in list_words:
+        gallows(attempt)
         print(list_words)
         letters_remain()
-        letters = input(f"\nВведите букву, у Вас осталось {attempt} попыток:")
+        letters = input(f"\nВведите букву, у Вас оталось {attempt} попыток:").upper()
 
-        if letters.lower() in letters_remains and letters.lower() in text:
+        if letters.upper() in letters_remains and letters.upper() in text:
             found_letter(letters, text, list_words)
-        elif letters.lower() in letters_remains and letters.lower() not in text:
+        elif letters.upper() in letters_remains and letters.upper() not in text:
             print(f"Вы не угадали букву!")
-            letters_remains.remove(letters.lower())
+            letters_remains.remove(letters.upper())
             attempt-=1
         else:
-            print(f"Введите букву из списка")
+            print(f"Введити букву из списка")
+
         if attempt<=0:
-            print(f'Вы проиграли. Было загадано слово: "{words}"')
-            exit=input("Нажмите Enter для выхода: ")
-            if exit=="":
+            gallows(attempt)
+            print()
+            print(f'Вы проиграли. Было загаданно слово: "{words}"')
+            exit_game=input("Нажмите Enter для выхода: ")
+            if exit_game=="":
                 print("Пока")
                 return
 
 def game(words):
     text = list(words)
-    list_words = ["*" for i in range(len(words))]
+    list_words = ["_" for _ in range(len(words))]
     check_letter(text, list_words)
 
 if __name__ == "__main__":
