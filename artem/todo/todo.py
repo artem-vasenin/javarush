@@ -1,3 +1,5 @@
+import datetime
+
 mode = 'menu'
 db = []
 
@@ -7,21 +9,21 @@ def load_db() -> None:
         db = []
         for i in [x.strip() for x in f]:
             line = i.split('|')
-            dct = {'id': int(line[0]), 'title': line[1], 'isFinished': bool(int(line[2]))}
+            dct = {'id': int(line[0]), 'date': line[1], 'title': line[2], 'isFinished': bool(int(line[3]))}
             db.append(dct)
 
 def save_in_db() -> None:
     with open('db.txt', 'w') as f:
         lst = []
         for i in [x for x in db]:
-            lst.append(f'{i['id']}|{i['title']}|{int(i['isFinished'])}\n')
+            lst.append(f'{i['id']}|{i['date']}|{i['title']}|{int(i['isFinished'])}\n')
         f.writelines(lst)
 
 def print_todos(lst):
     print('='*100)
     if len(lst):
         for i in range(len(lst)):
-            print(f'| ID: {lst[i]["id"]} | "{lst[i]['title']}" {"| (Завершена)" if lst[i]['isFinished'] else ""}')
+            print(f'| ID: {lst[i]["id"]} | Date: {lst[i]["date"]} | "{lst[i]['title']}" {"| (Завершена)" if lst[i]['isFinished'] else ""}')
             if len(lst)-1 != i:
                 print('-'*100)
     else:
@@ -35,7 +37,8 @@ def get_todos():
 def add_todo():
     title = input('Введите заголовок: ')
     idx = max([e["id"] for e in db]) + 1 if db else 1
-    db.append({'id': int(idx), 'title': title, 'isFinished': False})
+    dt = datetime.datetime.now()
+    db.append({'id': int(idx), 'date': f'{dt.day}-{dt.month}-{dt.year} {dt.hour}:{dt.minute}', 'title': title, 'isFinished': False})
     save_in_db()
     print('Запись успешно добавлена')
     print_todos(db)
