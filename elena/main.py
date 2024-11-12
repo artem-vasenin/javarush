@@ -6,7 +6,7 @@ letters_remains = [chr(x) for x in range(1072, 1104)]
 words = None
 number_levels = ["Пять букв", "Шесть букв", "Семь букв", "Восемь букв"]
 five_letters = ["армия", "акула", "башня", "вафля", "газон", "гуашь"]
-six_letters = ["йогурт", "лстья", "червяк", "яблоко", "биолог", "бизнес", "гвоздь"] # опечатка лстья
+six_letters = ["йогурт", "листья", "червяк", "яблоко", "биолог", "бизнес", "гвоздь"] # опечатка лстья
 seven_letters = ["зеркало", "джекпот", "леопард", "подъезд", "дельфин"]
 eight_letters = ["авимбуве", "детектив", "агенство"]
 list_letters = [five_letters, six_letters, seven_letters, eight_letters]
@@ -57,8 +57,8 @@ def found_letter(letters, text, list_words):
         text[text.index(letters)] = None
     if "*" not in list_words:
         print(f"Вы выиграли! Было загадано слово: {words}")
-        exit = input("Нажмите Enter для выхода: ")
-        if exit=="":
+        exit_game = input("Нажмите Enter для выхода: ")
+        if exit_game=="":
             print("Пока")
             return
 
@@ -78,18 +78,19 @@ def check_letter(text, list_words):
             attempt-=1
         else:
             print(f"Введити букву из списка")
+
         if attempt<=0:
             gallows(attempt)
             print()
             print(f'Вы проиграли. Было загаданно слово: "{words}"')
-            exit=input("Нажмите Enter для выхода: ")
-            if exit=="":
+            exit_game=input("Нажмите Enter для выхода: ")
+            if exit_game=="":
                 print("Пока")
                 return
 
 def game(words):
     text = list(words)
-    list_words = ["*" for i in range(len(words))]
+    list_words = ["*" for _ in range(len(words))]
     check_letter(text, list_words)
 
 if __name__ == "__main__":
