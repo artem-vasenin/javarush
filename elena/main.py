@@ -32,7 +32,7 @@ def level_selection():
     for index, value in enumerate(number_levels):
         print(f"{index+1}. {value}")
     while True:
-        lvl = input(f"Выбирите уровень от 1 до {len(number_levels)}: ")
+        lvl = input(f"Выберите уровень от 1 до {len(number_levels)}: ")
         if lvl.isdigit() and 0<int(lvl)<=len(number_levels):
             return game_levels(lvl)
         else:
@@ -68,7 +68,7 @@ def check_letter(text, list_words):
         gallows(attempt)
         print(list_words)
         letters_remain()
-        letters = input(f"\nВведите букву, у Вас оталось {attempt} попыток:").upper()
+        letters = input(f"\nВведите букву, у Вас осталось {attempt} попыток:").upper()
 
         if letters.upper() in letters_remains and letters.upper() in text:
             found_letter(letters, text, list_words)
@@ -77,12 +77,12 @@ def check_letter(text, list_words):
             letters_remains.remove(letters.upper())
             attempt-=1
         else:
-            print(f"Введити букву из списка")
+            print(f"Введите букву из списка")
 
         if attempt<=0:
             gallows(attempt)
             print()
-            print(f'Вы проиграли. Было загаданно слово: "{words}"')
+            print(f'Вы проиграли. Было загадано слово: "{words}"')
             exit_game=input("Нажмите Enter для выхода: ")
             if exit_game=="":
                 print("Пока")
