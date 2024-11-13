@@ -50,6 +50,8 @@ def letters_remain():
         print(i, end=" ")
 
 def found_letter(letters, text, list_words):
+    global attempt
+    global letters_remains
     print(f"Вы угадали букву!")
     letters_remains.remove(letters.upper())
     while letters.upper() in text:
@@ -57,13 +59,18 @@ def found_letter(letters, text, list_words):
         text[text.index(letters)] = None
     if "_" not in list_words:
         print(f"Вы выиграли! Было загадано слово: {words}")
-        exit_game = input("Нажмите Enter для выхода: ")
-        if exit_game=="":
+        exit_game = input('Нажмите "Пробел" для выхода или "Enter" для еще одной игры: ')
+        if exit_game == " ":
             print("Пока")
             return
+        elif exit_game == "":
+            attempt = 6
+            letters_remains = [chr(x) for x in range(1040, 1072)]
+            level_selection()
 
 def check_letter(text, list_words):
     global attempt
+    global letters_remains
     while attempt>0 and "_" in list_words:
         gallows(attempt)
         print(list_words)
@@ -83,10 +90,14 @@ def check_letter(text, list_words):
             gallows(attempt)
             print()
             print(f'Вы проиграли. Было загадано слово: "{words}"')
-            exit_game=input("Нажмите Enter для выхода: ")
-            if exit_game=="":
+            exit_game=input('Нажмите "Пробел" для выхода или "Enter" для еще одной игры: ')
+            if exit_game==" ":
                 print("Пока")
                 return
+            elif exit_game=="":
+                attempt = 6
+                letters_remains = [chr(x) for x in range(1040, 1072)]
+                level_selection()
 
 def game(words):
     text = list(words)
