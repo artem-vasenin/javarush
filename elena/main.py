@@ -1,3 +1,4 @@
+from os.path import split
 from random import randrange
 
 
@@ -5,12 +6,29 @@ attempt = 6
 letters_remains = [chr(x) for x in range(1040, 1072)]
 words = None
 number_levels = ["Пять букв", "Шесть букв", "Семь букв", "Восемь букв"]
-five_letters = ["АРМИЯ", "АКУЛА", "БАШНЯ", "ВАФЛЯ", "ГАЗОН", "ГУАШЬ"]
-six_letters = ["ЙОГУРТ", "ЛИСТЬЯ", "ЧЕРВЯК", "ЯБЛОКО", "БИОЛОГ", "БИЗНЕС", "ГВОЗДЬ"]
-seven_letters = ["ЗЕРКАЛО", "ДЖЕКПОТ", "ЛЕОПАРД", "ПОДЪЕЗД", "ДЕЛЬФИН"]
-eight_letters = ["ПРОСТУДА", "ДЕТЕКТИВ", "АГЕНСТВО", "ФУТБОЛКА"]
-list_letters = [five_letters, six_letters, seven_letters, eight_letters]
-dict_letters = {i+1:letter for i, letter in enumerate(list_letters)}
+five_letters = []
+six_letters = []
+seven_letters = []
+eight_letters = []
+list_letters = []
+dict_letters = {}
+
+def forming_list():
+    global  five_letters
+    global six_letters
+    global seven_letters
+    global eight_letters
+    global list_letters
+    global dict_letters
+    with open('words.txt', 'r', encoding="UTF-8") as file:
+        lines = file.read()
+    words_list = lines.split(":")
+    five_letters = [line.strip().upper() for line in words_list if len(line.strip())==5]
+    six_letters = [line.strip().upper() for line in words_list if len(line.strip()) == 6]
+    seven_letters = [line.strip().upper() for line in words_list if len(line.strip()) == 7]
+    eight_letters = [line.strip().upper() for line in words_list if len(line.strip()) == 8]
+    list_letters = [five_letters, six_letters, seven_letters, eight_letters]
+    dict_letters = {i + 1: letter for i, letter in enumerate(list_letters)}
 
 def gallows(attempt):
     if attempt == 0:
@@ -52,6 +70,7 @@ def letters_remain():
 def found_letter(letters, text, list_words):
     global attempt
     global letters_remains
+    flag = True
     print(f"Вы угадали букву!")
     letters_remains.remove(letters.upper())
     while letters.upper() in text:
@@ -59,18 +78,23 @@ def found_letter(letters, text, list_words):
         text[text.index(letters)] = None
     if "_" not in list_words:
         print(f"Вы выиграли! Было загадано слово: {words}")
-        exit_game = input('Нажмите "Пробел" для выхода или "Enter" для еще одной игры: ')
-        if exit_game == " ":
-            print("Пока")
-            return
-        elif exit_game == "":
-            attempt = 6
-            letters_remains = [chr(x) for x in range(1040, 1072)]
-            level_selection()
+        exit_game = input('Вы хотите сыграть еще одну игру? Введите "Да" или "Нет": ')
+        while flag:
+            if exit_game.lower() == "нет":
+                print("Пока")
+                flag = False
+            elif exit_game.lower() == "да":
+                attempt = 6
+                letters_remains = [chr(x) for x in range(1040, 1072)]
+                flag = False
+                level_selection()
+            else:
+                exit_game = input('Введите "Да" или "Нет": ')
 
 def check_letter(text, list_words):
     global attempt
     global letters_remains
+    flag = True
     while attempt>0 and "_" in list_words:
         gallows(attempt)
         print(list_words)
@@ -90,14 +114,18 @@ def check_letter(text, list_words):
             gallows(attempt)
             print()
             print(f'Вы проиграли. Было загадано слово: "{words}"')
-            exit_game=input('Нажмите "Пробел" для выхода или "Enter" для еще одной игры: ')
-            if exit_game==" ":
-                print("Пока")
-                return
-            elif exit_game=="":
-                attempt = 6
-                letters_remains = [chr(x) for x in range(1040, 1072)]
-                level_selection()
+            exit_game = input('Вы хотите сыграть еще одну игру? Введите "Да" или "Нет": ')
+            while flag:
+                if exit_game.lower() == "нет":
+                    flag = False
+                    print("Пока")
+                elif exit_game.lower() == "да":
+                    attempt = 6
+                    letters_remains = [chr(x) for x in range(1040, 1072)]
+                    flag = False
+                    level_selection()
+                else:
+                    exit_game = input('Введите "Да" или "Нет": ')
 
 def game(words):
     text = list(words)
@@ -105,6 +133,7 @@ def game(words):
     check_letter(text, list_words)
 
 if __name__ == "__main__":
+    forming_list()
     level_selection()
 
 
