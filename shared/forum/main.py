@@ -92,3 +92,4 @@ def hacker():
 
 
 print_menu()
+choose_action()
