@@ -19,7 +19,7 @@ def save_in_db() -> None:
             lst.append(f'{i['id']}|{i['date']}|{i['title']}|{int(i['isFinished'])}\n')
         f.writelines(lst)
 
-def print_todos(lst):
+def print_todos(lst: list[dict]) -> None:
     print('='*100)
     if len(lst):
         for i in range(len(lst)):
@@ -30,11 +30,11 @@ def print_todos(lst):
         print('Записей пока нет. Самое время добавить!')
     print('='*100)
 
-def get_todos():
+def get_todos() -> None:
     load_db()
     print_todos(db)
 
-def add_todo():
+def add_todo() -> None:
     title = input('Введите заголовок: ')
     idx = max([e["id"] for e in db]) + 1 if db else 1
     dt = datetime.datetime.now()
@@ -43,7 +43,7 @@ def add_todo():
     print('Запись успешно добавлена')
     print_todos(db)
 
-def check_todo():
+def check_todo() -> None:
     idx = int(input('Введите ID задачи которую хотите завершить: '))
     result = [e for e in db if e['id'] == idx]
     if len(result):
@@ -54,7 +54,7 @@ def check_todo():
     else:
         print('Записи с таким ID в списке нет', end='\n\n')
 
-def remove_todo():
+def remove_todo() -> None:
     global db
     idx = input()
     if idx.isdigit() and int(idx) in [e['id'] for e in db]:
@@ -65,7 +65,7 @@ def remove_todo():
     else:
         print('Введен неверный ID или записи с таким ID в списке нет')
 
-def finish():
+def finish() -> None:
     global mode
     print('============= Bye-bye! =============')
     mode = 'finished'
@@ -87,12 +87,12 @@ settings = {
     }
 }
 
-def get_menu():
+def get_menu() -> None:
     print(*[f'{k}: {v}' for k, v in settings['menu'].items()], sep='\n')
     chose = input('Введите номер пункта меню: ')
     settings['menu_actions'][chose]() if chose in settings['menu_actions'] else print('Ошибка ввода')
 
-def render_todo():
+def render_todo() -> None:
     while mode == 'menu':
         get_menu()
 
