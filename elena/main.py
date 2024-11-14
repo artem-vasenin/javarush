@@ -1,4 +1,3 @@
-from os.path import split
 from random import randrange
 
 
@@ -81,6 +80,7 @@ def found_letter(letters, text, list_words):
         exit_game = input('Вы хотите сыграть еще одну игру? Введите "Да" или "Нет": ')
         while flag:
             if exit_game.lower() == "нет":
+                attempt -= 1
                 print("Пока")
                 flag = False
             elif exit_game.lower() == "да":
@@ -117,6 +117,7 @@ def check_letter(text, list_words):
             exit_game = input('Вы хотите сыграть еще одну игру? Введите "Да" или "Нет": ')
             while flag:
                 if exit_game.lower() == "нет":
+                    attempt -= 1
                     flag = False
                     print("Пока")
                 elif exit_game.lower() == "да":
