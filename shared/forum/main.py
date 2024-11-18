@@ -5,7 +5,7 @@ import string
 
 mode = None
 admin = False
-dict_branch = {1:"Погода", 2:"Работа", 3:"Дети"}
+dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
 
 def write_post():
     pass
