@@ -4,11 +4,14 @@ import os.path
 import string
 
 # ToDo: думаю может нам завести словарь settings куда настройки состояния писать будем?
+# Даже нужно, но я пока создам соварь с ветками)
 mode = None
 admin = False
+dict_branch = {1:"Погода", 2:"Работа", 3:"Дети"}
 
 # ToDo: хмммм откуда self в процедурном то варианте?)
-def write_post(self):
+# Это отголоски моей пробы пера на ООП )
+def write_post():
     pass
 
 def print_menu() -> None:
@@ -35,30 +38,21 @@ def check_login(login: str):
 def check_password(password):
     # функция для проверки надежности пароля
     # ToDo: три похожих цикла с разным условием так и просится на отдельную функцию (пока сам не придумал какую...)
-    count = 0
+    # Так лучше?)
+    list_check = [0, 0, 0, 0]
     for i in password:
         if i in string.ascii_uppercase:
-            count+=1
-            break
-    for i in password:
+            list_check[0] +=1
         if i in string.ascii_lowercase:
-            count+=1
-            break
-    for i in password:
+            list_check[1] +=1
         if i in string.digits:
-            count+=1
-            break
-    if len(password)>5:
-        count += 1
-    # ToDo: тут можно просто сделать return count == 4 (это приведется к булеву и вернется)
-    if count == 4:
-        return True
-    else:
-        return False
+            list_check[2] +=1
+        if len(password) > 5:
+            list_check[3] +=1
+    return not list_check.count(0)
 
 def register():
     global admin
-    current_directory = os.getcwd()
     login = input("Введите Ваш логин (только латинские буквы и цифры): ").strip()
     check, err = check_login(login)
     if not check:
