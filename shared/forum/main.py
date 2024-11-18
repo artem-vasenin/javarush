@@ -4,6 +4,10 @@ import os.path
 from itertools import count
 import string
 
+admin = False
+
+def write_post(self):
+    pass
 
 def print_menu():
     menu_options = {
@@ -58,6 +62,7 @@ def check_password(password):
         return False
 
 def register():
+    global admin
     current_directory = os.getcwd()
     """
     Простая регистрация без проверки сложности пароля (пока)
@@ -83,6 +88,8 @@ def register():
     "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно
      """
     secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
+    if secretkey!="тут будет очень секретный ключ":
+        admin = True
 
 def authentication():
     pass
