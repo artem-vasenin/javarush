@@ -3,13 +3,13 @@ from datetime import datetime
 import os.path
 import string
 
+dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
 settings = {
     'mode': None,
     'role': None,
 }
 
-# ToDo: хмммм откуда self в процедурном то варианте?)
-def write_post(self):
+def write_post():
     pass
 
 def print_menu() -> None:
@@ -24,9 +24,6 @@ def print_menu() -> None:
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
 
-def get_user_by_login(login: str) -> str:
-    pass
-
 def check_login(login: str):
     """ Проверка логина пользователя """
     if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
@@ -37,28 +34,18 @@ def check_login(login: str):
         return True, ''
 
 def check_password(password):
-    """ функция для проверки надежности пароля """
-    # ToDo: три похожих цикла с разным условием так и просится на отдельную функцию (пока сам не придумал какую...)
-    count = 0
+    # функция для проверки надежности пароля
+    list_check = [0, 0, 0, 0]
     for i in password:
         if i in string.ascii_uppercase:
-            count+=1
-            break
-    for i in password:
+            list_check[0] +=1
         if i in string.ascii_lowercase:
-            count+=1
-            break
-    for i in password:
+            list_check[1] +=1
         if i in string.digits:
-            count+=1
-            break
-    if len(password)>5:
-        count += 1
-    # ToDo: тут можно просто сделать return count == 4 (это приведется к булеву и вернется)
-    if count == 4:
-        return True
-    else:
-        return False
+            list_check[2] +=1
+        if len(password) > 5:
+            list_check[3] +=1
+    return not list_check.count(0)
 
 def register():
     global admin
