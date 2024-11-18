@@ -3,9 +3,10 @@ from datetime import datetime
 import os.path
 import string
 
-# ToDo: думаю может нам завести словарь settings куда настройки состояния писать будем?
-mode = None
-admin = False
+settings = {
+    'mode': None,
+    'role': None,
+}
 
 # ToDo: хмммм откуда self в процедурном то варианте?)
 def write_post(self):
@@ -23,6 +24,9 @@ def print_menu() -> None:
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
 
+def get_user_by_login(login: str) -> str:
+    pass
+
 def check_login(login: str):
     """ Проверка логина пользователя """
     if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
@@ -33,7 +37,7 @@ def check_login(login: str):
         return True, ''
 
 def check_password(password):
-    # функция для проверки надежности пароля
+    """ функция для проверки надежности пароля """
     # ToDo: три похожих цикла с разным условием так и просится на отдельную функцию (пока сам не придумал какую...)
     count = 0
     for i in password:
@@ -58,7 +62,6 @@ def check_password(password):
 
 def register():
     global admin
-    current_directory = os.getcwd()
     login = input("Введите Ваш логин (только латинские буквы и цифры): ").strip()
     check, err = check_login(login)
     if not check:
@@ -117,8 +120,10 @@ def unblock_users():
 def delete_users():
     pass
 
-def get_user_lists():
+def get_user_list():
     pass
+    # with open(os.path.join(os.getcwd(), "users", login+".txt"), 'w', encoding="utf-8") as file:
+    #     file.writelines([f'login|{login}\n', f'password|{hash_password}\n', f'createdAt|{datetime.now()}\n'])
 
 def print_branches():
     pass
@@ -135,7 +140,7 @@ def choose_action():
     actions = {
         1: register,
         2: authentication,
-        3: get_user_lists,
+        3: get_user_list,
         4: print_branches,
         5: finish_program,
     }
