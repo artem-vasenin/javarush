@@ -3,14 +3,10 @@ from datetime import datetime
 import os.path
 import string
 
-# ToDo: думаю может нам завести словарь settings куда настройки состояния писать будем?
-# Даже нужно, но я пока создам соварь с ветками)
 mode = None
 admin = False
 dict_branch = {1:"Погода", 2:"Работа", 3:"Дети"}
 
-# ToDo: хмммм откуда self в процедурном то варианте?)
-# Это отголоски моей пробы пера на ООП )
 def write_post():
     pass
 
@@ -37,8 +33,6 @@ def check_login(login: str):
 
 def check_password(password):
     # функция для проверки надежности пароля
-    # ToDo: три похожих цикла с разным условием так и просится на отдельную функцию (пока сам не придумал какую...)
-    # Так лучше?)
     list_check = [0, 0, 0, 0]
     for i in password:
         if i in string.ascii_uppercase:
