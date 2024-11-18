@@ -118,8 +118,9 @@ def print_branches():
         for keys, values in value.items():
             print(f"{key}: {keys}")
     if admin:
-        print("_______________________")
+        print("____________________________")
         print(f"{len(dict_branch)+1}: Создать новую ветку")
+        print(f"{len(dict_branch) + 2}: Удалить действующую ветку")
 
 def hacker():
     pass
