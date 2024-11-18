@@ -5,7 +5,7 @@ import string
 
 dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
 settings = {
-    'mode': None,
+    'mode': 0,
     'role': None,
 }
 
@@ -123,7 +123,6 @@ def finish_program():
 
 def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
-    global mode
     actions = {
         1: register,
         2: authentication,
@@ -133,7 +132,7 @@ def choose_action():
     }
     select = input("Выберите пункт меню: ")
     result = int(select) if select.isdigit() and 0 < int(select) < 6 else 5
-    mode = result
+    settings['mode'] = result
     actions[result]()
 
 
