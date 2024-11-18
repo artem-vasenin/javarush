@@ -9,7 +9,11 @@ settings = {
     'mode': 0,
 }
 
+
 def get_users_from_db() -> tuple[dict, str]:
+    """ Функция получающая всех пользователей из базы. При успехе возвращает словарь с полями
+    {users: [{...}], len: int}
+    при неудаче возвращает пустой словарь и ошибку"""
     users_db = [f for f in os.listdir(os.path.join(os.getcwd(), "users", )) if '.json' in f]
     data = {}
     if not len(users_db):
@@ -20,7 +24,9 @@ def get_users_from_db() -> tuple[dict, str]:
 
     return (data, '') if data else (data, 'Список пользователей пуст')
 
+
 def get_user_by_login(login: str) -> tuple[dict, str]:
+    """ Функция получающая пользователя из базы по логину, если отсутствует получаем пустой словарь и ошибку """
     data, err = get_users_from_db()
     if err:
         return data, err
@@ -28,7 +34,9 @@ def get_user_by_login(login: str) -> tuple[dict, str]:
         lst = [x for x in data['users'] if x['login'] == login]
         return (lst[0], '') if lst else ({}, 'Пользователь не найден')
 
+
 def save_user_to_db(user: dict) -> None:
+    """ Функция записи пользователя в базу данных """
     data, error = get_users_from_db()
 
     if error and not data:
@@ -40,6 +48,7 @@ def save_user_to_db(user: dict) -> None:
 
     with open(os.path.join(os.getcwd(), "users", "users.json"), 'w', encoding="utf-8") as file:
         json.dump(data, file, indent=2)
+
 
 def print_menu() -> None:
     """ Главное меню приложения """
@@ -53,6 +62,7 @@ def print_menu() -> None:
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
 
+
 def check_login(login: str) -> tuple[bool, str]:
     """ Проверка логина пользователя """
     if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
@@ -63,8 +73,9 @@ def check_login(login: str) -> tuple[bool, str]:
     else:
         return True, ''
 
+
 def check_password(password):
-    # функция для проверки надежности пароля
+    """ функция для проверки надежности пароля """
     list_check = [0, 0, 0, 0]
     for i in password:
         if i in string.ascii_uppercase:
@@ -77,7 +88,9 @@ def check_password(password):
             list_check[3] +=1
     return not list_check.count(0)
 
+
 def register():
+    """ Функция регистрации нового пользователя """
     role = 'user'
     login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
     check, err = check_login(login)
@@ -91,10 +104,8 @@ def register():
         password = input("Пароль не безопасный, введите другой: ")
 
     hash_password = hashlib.md5(password.encode()).hexdigest()
-    """ 
-    по запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
-    "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно
-     """
+    """ По запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
+    "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно """
     secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
     if secretkey == "аз есмь царь!":
         role = 'admin'
@@ -110,6 +121,7 @@ def register():
         'city': '',
     }
     save_user_to_db(user)
+
 
 def write_post():
     pass
@@ -150,7 +162,9 @@ def unblock_users():
 def delete_users():
     pass
 
+
 def print_users() -> None:
+    """ Функция запрашивающая список пользователей и выводящая его на печать. Когда будет присвоение ролей надо ее дописать """
     data, err = get_users_from_db()
     print('='*60)
     if err:
@@ -162,6 +176,7 @@ def print_users() -> None:
             print('-'*60 if i + 1 < data['len'] else '', end='\n' if i + 1 < data['len'] else '')
     print('='*60)
 
+
 def print_branches():
     pass
 
@@ -170,6 +185,7 @@ def hacker():
 
 def finish_program():
     pass
+
 
 def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
