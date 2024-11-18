@@ -113,7 +113,7 @@ def get_user_lists():
     pass
 
 def print_branches():
-    print("Выбирите ветку: ")
+    print("Выберете ветку: ")
     for key, value in dict_branch.items():
         for keys, values in value.items():
             print(f"{key}: {keys}")
