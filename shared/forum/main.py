@@ -1,15 +1,16 @@
 import hashlib
-import datetime
+from datetime import datetime
 import os.path
-from itertools import count
 import string
 
+mode = None
 admin = False
 
 def write_post(self):
     pass
 
-def print_menu():
+def print_menu() -> None:
+    """ Функция стартер приложения """
     menu_options = {
         1: 'Регистрация',
         2: 'Аутентификация',
@@ -19,25 +20,6 @@ def print_menu():
     }
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
-    user_choose = input("Выберите пункт меню: ")
-    while True:
-        if user_choose.isdigit() and 0<int(user_choose)<6:
-            choose_action(user_choose)
-            break
-        else:
-            user_choose = input(f"Выберите пункт от 1 до {len(menu_options)}: ")
-
-def choose_action(user_choose):
-    if int(user_choose) == 1:
-        register()
-    elif int(user_choose)  == 2:
-        authentication()
-    elif int(user_choose)  == 3:
-        get_user_lists()
-    elif int(user_choose)  == 4:
-        print_branches()
-    elif int(user_choose)  == 5:
-        return None
 
 def check_login(login: str):
     """ Проверка логина пользователя """
@@ -84,9 +66,8 @@ def register():
     while not check_password(password):
         password = input("Пароль не безопасный, введите другой: ")
     hash_password = hashlib.md5(password.encode()).hexdigest()
-    with open(f'{current_directory}\\users\\{login}.txt', 'w', encoding="utf-8") as file:
-        file.write(login)
-        file.write(hash_password)
+    with open(f'{current_directory}/users/{login}.txt', 'w', encoding="utf-8") as file:
+        file.writelines([f'login|{login}\n', f'password|{hash_password}\n', f'createdAt|{datetime.now()}\n'])
     """ 
     по запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
     "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно
@@ -140,5 +121,24 @@ def print_branches():
 def hacker():
     pass
 
+def finish_program():
+    pass
+
+def choose_action():
+    """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
+    global mode
+    actions = {
+        1: register,
+        2: authentication,
+        3: get_user_lists,
+        4: print_branches,
+        5: finish_program,
+    }
+    select = input("Выберите пункт меню: ")
+    result = int(select) if select.isdigit() and 0 < int(select) < 6 else 5
+    mode = result
+    actions[result]()
+
 
 print_menu()
+choose_action()
