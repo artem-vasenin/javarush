@@ -1,5 +1,6 @@
 import hashlib
 from datetime import datetime
+import json
 import os.path
 import string
 
@@ -24,11 +25,11 @@ def print_menu() -> None:
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
 
-def check_login(login: str):
+def check_login(login: str) -> tuple[bool, str]:
     """ Проверка логина пользователя """
     if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
         return False, 'Логин введен некорректно. Повторите ввод.'
-    elif os.path.exists(os.path.join(os.getcwd(), "users", login+".txt")):
+    elif os.path.exists(os.path.join(os.getcwd(), "users", login+".csv")):
         return False, 'Имя пользователя уже занято. Повторите ввод.'
     else:
         return True, ''
@@ -49,7 +50,7 @@ def check_password(password):
 
 def register():
     global admin
-    login = input("Введите Ваш логин (только латинские буквы и цифры): ").strip()
+    login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
     check, err = check_login(login)
     if not check:
         print(err)
@@ -61,15 +62,26 @@ def register():
         password = input("Пароль не безопасный, введите другой: ")
 
     hash_password = hashlib.md5(password.encode()).hexdigest()
-    with open(os.path.join(os.getcwd(), "users", login+".txt"), 'w', encoding="utf-8") as file:
-        file.writelines([f'login|{login}\n', f'password|{hash_password}\n', f'createdAt|{datetime.now()}\n'])
     """ 
     по запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
     "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно
      """
     secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
-    if secretkey!="тут будет очень секретный ключ":
+    if secretkey != "тут будет очень секретный ключ":
         admin = True
+
+    with open(os.path.join(os.getcwd(), "users", login+".json"), 'w', encoding="utf-8") as file:
+        user = {
+            'login': login,
+            'passhash': hash_password,
+            'role': 'admin' if admin else 'user',
+            'blocked_at': '',
+            'blocked_reason': '',
+            'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'name': '',
+            'city': '',
+        }
+        json.dump(user, file, indent=2)
 
 def authentication():
     pass
@@ -107,10 +119,24 @@ def unblock_users():
 def delete_users():
     pass
 
-def get_user_list():
-    pass
-    # with open(os.path.join(os.getcwd(), "users", login+".txt"), 'w', encoding="utf-8") as file:
-    #     file.writelines([f'login|{login}\n', f'password|{hash_password}\n', f'createdAt|{datetime.now()}\n'])
+def get_user_list() -> list:
+    users_files = [f for f in os.listdir(os.path.join(os.getcwd(), "users")) if '.json' in f]
+    users = []
+    for user_file in users_files:
+        with open(os.path.join(os.getcwd(), "users", user_file), encoding="utf-8") as file:
+            users.append(json.load(file))
+    return users
+
+def print_users() -> None:
+    users = get_user_list()
+    print('='*60)
+    if not len(users):
+        print('Список пользователей пока пуст...')
+    else:
+        for i in range(len(users)):
+            print(f'login: {users[i]["login"]} | role: {users[i]["role"]} | registered: {users[i]["created_at"]}')
+            print('-'*60 if i + 1 < len(users) else '', end='\n' if i + 1 < len(users) else '')
+    print('='*60)
 
 def print_branches():
     pass
@@ -126,7 +152,7 @@ def choose_action():
     actions = {
         1: register,
         2: authentication,
-        3: get_user_list,
+        3: print_users,
         4: print_branches,
         5: finish_program,
     }
