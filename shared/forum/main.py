@@ -5,7 +5,11 @@ import string
 
 mode = None
 admin = False
-dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
+dict_branch = {
+    1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]},
+    2:{"Работа":["Начальство", "Коллеги"]},
+    3:{"Дети":["Малоежка", "Плохо спит"]}
+    }
 
 def write_post():
     pass
@@ -109,7 +113,13 @@ def get_user_lists():
     pass
 
 def print_branches():
-    pass
+    print("Выбирите ветку: ")
+    for key, value in dict_branch.items():
+        for keys, values in value.items():
+            print(f"{key}: {keys}")
+    if admin:
+        print("_______________________")
+        print(f"{len(dict_branch)+1}: Создать новую ветку")
 
 def hacker():
     pass
