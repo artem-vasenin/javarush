@@ -3,9 +3,11 @@ from datetime import datetime
 import os.path
 import string
 
+# ToDo: думаю может нам завести словарь settings куда настройки состояния писать будем?
 mode = None
 admin = False
 
+# ToDo: хмммм откуда self в процедурном то варианте?)
 def write_post(self):
     pass
 
@@ -32,6 +34,7 @@ def check_login(login: str):
 
 def check_password(password):
     # функция для проверки надежности пароля
+    # ToDo: три похожих цикла с разным условием так и просится на отдельную функцию (пока сам не придумал какую...)
     count = 0
     for i in password:
         if i in string.ascii_uppercase:
@@ -47,6 +50,7 @@ def check_password(password):
             break
     if len(password)>5:
         count += 1
+    # ToDo: тут можно просто сделать return count == 4 (это приведется к булеву и вернется)
     if count == 4:
         return True
     else:
@@ -65,6 +69,7 @@ def register():
     password = input("Введите Ваш пароль: ")
     while not check_password(password):
         password = input("Пароль не безопасный, введите другой: ")
+
     hash_password = hashlib.md5(password.encode()).hexdigest()
     with open(f'{current_directory}/users/{login}.txt', 'w', encoding="utf-8") as file:
         file.writelines([f'login|{login}\n', f'password|{hash_password}\n', f'createdAt|{datetime.now()}\n'])
