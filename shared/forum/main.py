@@ -27,7 +27,7 @@ def check_login(login: str):
     """ Проверка логина пользователя """
     if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
         return False, 'Логин введен некорректно. Повторите ввод.'
-    elif os.path.exists(f'{os.getcwd()}/users/{login}.txt'):
+    elif os.path.exists(os.path.join(os.getcwd(), "users", login+".txt")):
         return False, 'Имя пользователя уже занято. Повторите ввод.'
     else:
         return True, ''
@@ -71,7 +71,7 @@ def register():
         password = input("Пароль не безопасный, введите другой: ")
 
     hash_password = hashlib.md5(password.encode()).hexdigest()
-    with open(f'{current_directory}/users/{login}.txt', 'w', encoding="utf-8") as file:
+    with open(os.path.join(os.getcwd(), "users", login+".txt"), 'w', encoding="utf-8") as file:
         file.writelines([f'login|{login}\n', f'password|{hash_password}\n', f'createdAt|{datetime.now()}\n'])
     """ 
     по запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
