@@ -39,6 +39,15 @@ def choose_action(user_choose):
     elif int(user_choose)  == 5:
         return None
 
+def check_login(login: str):
+    """ Проверка логина пользователя """
+    if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
+        return False, 'Логин введен некорректно. Повторите ввод.'
+    elif os.path.exists(f'{os.getcwd()}/users/{login}.txt'):
+        return False, 'Имя пользователя уже занято. Повторите ввод.'
+    else:
+        return True, ''
+
 def check_password(password):
     # функция для проверки надежности пароля
     count = 0
@@ -64,10 +73,6 @@ def check_password(password):
 def register():
     global admin
     current_directory = os.getcwd()
-    """
-    Простая регистрация без проверки сложности пароля (пока)
-    """
-    # возможно лучше проверять имя пользователя до запроса пароля?
     login = input("Введите Ваше имя пользователя: ")
     while True:
         if os.path.exists(f'{current_directory}\\users\\{login}.txt'):
