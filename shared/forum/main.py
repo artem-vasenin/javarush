@@ -7,14 +7,42 @@ import string
 dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
 settings = {
     'mode': 0,
-    'role': None,
 }
 
-def write_post():
-    pass
+def get_users_from_db() -> tuple[dict, str]:
+    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), "users", )) if '.json' in f]
+    data = {}
+    if not len(users_db):
+        return data, 'База данных не найдена'
+
+    with open(os.path.join(os.getcwd(), 'users', 'users.json'), encoding="utf-8") as file:
+        data = json.load(file)
+
+    return (data, '') if data else (data, 'Список пользователей пуст')
+
+def get_user_by_login(login: str) -> tuple[dict, str]:
+    data, err = get_users_from_db()
+    if err:
+        return data, err
+    else:
+        lst = [x for x in data['users'] if x['login'] == login]
+        return (lst[0], '') if lst else ({}, 'Пользователь не найден')
+
+def save_user_to_db(user: dict) -> None:
+    data, error = get_users_from_db()
+
+    if error and not data:
+        data['users'] = [user]
+        data['len'] = 1
+    else:
+        data['users'].append(user)
+        data['len'] = len(data['users'])
+
+    with open(os.path.join(os.getcwd(), "users", "users.json"), 'w', encoding="utf-8") as file:
+        json.dump(data, file, indent=2)
 
 def print_menu() -> None:
-    """ Функция стартер приложения """
+    """ Главное меню приложения """
     menu_options = {
         1: 'Регистрация',
         2: 'Аутентификация',
@@ -29,7 +57,8 @@ def check_login(login: str) -> tuple[bool, str]:
     """ Проверка логина пользователя """
     if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
         return False, 'Логин введен некорректно. Повторите ввод.'
-    elif os.path.exists(os.path.join(os.getcwd(), "users", login+".csv")):
+    user, err = get_user_by_login(login)
+    if not err and user:
         return False, 'Имя пользователя уже занято. Повторите ввод.'
     else:
         return True, ''
@@ -49,7 +78,7 @@ def check_password(password):
     return not list_check.count(0)
 
 def register():
-    global admin
+    role = 'user'
     login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
     check, err = check_login(login)
     if not check:
@@ -67,21 +96,23 @@ def register():
     "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно
      """
     secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
-    if secretkey != "тут будет очень секретный ключ":
-        admin = True
+    if secretkey == "аз есмь царь!":
+        role = 'admin'
 
-    with open(os.path.join(os.getcwd(), "users", login+".json"), 'w', encoding="utf-8") as file:
-        user = {
-            'login': login,
-            'passhash': hash_password,
-            'role': 'admin' if admin else 'user',
-            'blocked_at': '',
-            'blocked_reason': '',
-            'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            'name': '',
-            'city': '',
-        }
-        json.dump(user, file, indent=2)
+    user = {
+        'login': login,
+        'passhash': hash_password,
+        'role': role,
+        'blocked_at': '',
+        'blocked_reason': '',
+        'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'name': '',
+        'city': '',
+    }
+    save_user_to_db(user)
+
+def write_post():
+    pass
 
 def authentication():
     pass
@@ -119,23 +150,16 @@ def unblock_users():
 def delete_users():
     pass
 
-def get_user_list() -> list:
-    users_files = [f for f in os.listdir(os.path.join(os.getcwd(), "users")) if '.json' in f]
-    users = []
-    for user_file in users_files:
-        with open(os.path.join(os.getcwd(), "users", user_file), encoding="utf-8") as file:
-            users.append(json.load(file))
-    return users
-
 def print_users() -> None:
-    users = get_user_list()
+    data, err = get_users_from_db()
     print('='*60)
-    if not len(users):
-        print('Список пользователей пока пуст...')
+    if err:
+        print(err)
     else:
-        for i in range(len(users)):
-            print(f'login: {users[i]["login"]} | role: {users[i]["role"]} | registered: {users[i]["created_at"]}')
-            print('-'*60 if i + 1 < len(users) else '', end='\n' if i + 1 < len(users) else '')
+        for i in range(data['len']):
+            u = data['users'][i]
+            print(f'login: {u["login"]} | role: {u["role"]} | registered: {u["created_at"]}', f'blocked: {u["blocked_at"]}' if u['blocked_at'] else '')
+            print('-'*60 if i + 1 < data['len'] else '', end='\n' if i + 1 < data['len'] else '')
     print('='*60)
 
 def print_branches():
