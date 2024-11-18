@@ -73,14 +73,13 @@ def check_password(password):
 def register():
     global admin
     current_directory = os.getcwd()
-    login = input("Введите Ваше имя пользователя: ")
-    while True:
-        if os.path.exists(f'{current_directory}\\users\\{login}.txt'):
-            login = input(f'Имя пользователя {login} уже существует, придумайте другое')
-        elif len(login)<3:
-            login = input("Имя пользователя должно быть не менее 4 символов, придумайте другое: ")
-        else:
-            break
+    login = input("Введите Ваш логин (только латинские буквы и цифры): ").strip()
+    check, err = check_login(login)
+    if not check:
+        print(err)
+        register()
+        return
+
     password = input("Введите Ваш пароль: ")
     while not check_password(password):
         password = input("Пароль не безопасный, введите другой: ")
