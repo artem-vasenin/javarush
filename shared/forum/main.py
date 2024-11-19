@@ -81,17 +81,16 @@ def check_password(password):
     flag = False
     if len(password) < 6:
         return flag
-    else:
-        for symbol in password:
-            if not symbol_list:
-                flag = True
+    for symbol in password:
+        if not symbol_list:
+            flag = True
+            break
+        flag = False
+        for ranges in symbol_list:
+            flag = flag or (symbol in ranges)
+            if flag:
+                symbol_list.remove(ranges)
                 break
-            flag = False
-            for ranges in symbol_list:
-                flag = flag or (symbol in ranges)
-                if flag:
-                    symbol_list.remove(ranges)
-                    break
     return flag
 
 def crypt_password(password) -> str:
