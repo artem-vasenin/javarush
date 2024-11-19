@@ -76,17 +76,16 @@ def check_login(login: str) -> tuple[bool, str]:
 
 def check_password(password):
     """ функция для проверки надежности пароля """
-    list_check = [0, 0, 0, 0]
-    for i in password:
-        if i in string.ascii_uppercase:
-            list_check[0] +=1
-        if i in string.ascii_lowercase:
-            list_check[1] +=1
-        if i in string.digits:
-            list_check[2] +=1
-        if len(password) > 5:
-            list_check[3] +=1
-    return not list_check.count(0)
+    #list_check = [0, 0, 0, 0]
+    flag = False
+    if len(password) < 6:
+        return flag
+    else:
+        for symbol in password:
+            for ranges in [string.ascii_uppercase, string.ascii_lowercase, string.digits]:
+                flag = flag or (symbol in ranges)
+    return flag
+
 
 
 def register():
