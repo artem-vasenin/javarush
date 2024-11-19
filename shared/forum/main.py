@@ -77,19 +77,20 @@ def check_login(login: str) -> tuple[bool, str]:
 def check_password(password):
     """ функция для проверки надежности пароля """
     #list_check = [0, 0, 0, 0]
-    dict = [string.ascii_uppercase, string.ascii_lowercase, string.digits]
+    symbol_list = [string.ascii_uppercase, string.ascii_lowercase, string.digits]
+    flag = False
     if len(password) < 6:
-        return False
+        return flag
     else:
         for symbol in password:
-            if dict == []:
+            if not symbol_list:
                 flag = True
                 break
             flag = False
-            for ranges in dict:
+            for ranges in symbol_list:
                 flag = flag or (symbol in ranges)
                 if flag:
-                    dict.remove(ranges)
+                    symbol_list.remove(ranges)
                     break
     return flag
 
