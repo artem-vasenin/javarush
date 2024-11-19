@@ -224,10 +224,10 @@ def choose_action():
         5: finish_program,
     }
     select = input("Выберите пункт меню: ")
-    result = int(select) if select.isdigit() and 0 < int(select) < 6 else 5
-    while result==5:
+    result = int(select) if select.isdigit() and 0 < int(select) < 6 else 6
+    while result==6:
         select = input(f"Введите корректно пункт меню, число от 1 до {len(actions)}: ")
-        result = int(select) if select.isdigit() and 0 < int(select) < 6 else 5
+        result = int(select) if select.isdigit() and 0 < int(select) < 6 else 6
     settings['mode'] = result
     actions[result]()
 
