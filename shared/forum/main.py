@@ -3,6 +3,7 @@ from datetime import datetime
 import json
 import os.path
 import string
+import re
 
 dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
 settings = {
@@ -65,7 +66,7 @@ def print_menu() -> None:
 
 def check_login(login: str) -> tuple[bool, str]:
     """ Проверка логина пользователя """
-    if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
+    if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha() or bool(re.search('[а-яА-Я]', login)):
         return False, 'Логин введен некорректно. Повторите ввод.'
     user, err = get_user_by_login(login)
     if not err and user:
