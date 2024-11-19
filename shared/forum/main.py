@@ -50,7 +50,7 @@ def save_user_to_db(user: dict) -> None:
         data['len'] = len(data['users'])
 
     with open(os.path.join(os.getcwd(), "users", "users.json"), 'w', encoding="utf-8") as file:
-        json.dump(data, file, indent=2)
+        json.dump(data, file, indent=2, ensure_ascii=False)
 
 
 def print_menu() -> None:
