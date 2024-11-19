@@ -1,21 +1,58 @@
 import hashlib
 from datetime import datetime
+import json
 import os.path
 import string
+import re
 
-mode = None
-admin = False
-dict_branch = {
-    1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]},
-    2:{"Работа":["Начальство", "Коллеги"]},
-    3:{"Дети":["Малоежка", "Плохо спит"]}
-    }
+dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
+settings = {
+    'mode': 0,
+}
 
-def write_post():
-    pass
+
+def get_users_from_db() -> tuple[dict, str]:
+    """ Функция получающая всех пользователей из базы. При успехе возвращает словарь с полями
+    {users: [{...}], len: int}
+    при неудаче возвращает пустой словарь и ошибку"""
+    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), "users", )) if '.json' in f]
+    data = {}
+    if not len(users_db):
+        return data, 'База данных не найдена'
+
+    with open(os.path.join(os.getcwd(), 'users', 'users.json'), encoding="utf-8") as file:
+        data = json.load(file)
+
+    return (data, '') if data else (data, 'Список пользователей пуст')
+
+
+def get_user_by_login(login: str) -> tuple[dict, str]:
+    """ Функция получающая пользователя из базы по логину, если отсутствует получаем пустой словарь и ошибку """
+    data, err = get_users_from_db()
+    if err:
+        return data, err
+    else:
+        lst = [x for x in data['users'] if x['login'] == login]
+        return (lst[0], '') if lst else ({}, 'Пользователь не найден')
+
+
+def save_user_to_db(user: dict) -> None:
+    """ Функция записи пользователя в базу данных """
+    data, error = get_users_from_db()
+
+    if error and not data:
+        data['users'] = [user]
+        data['len'] = 1
+    else:
+        data['users'].append(user)
+        data['len'] = len(data['users'])
+
+    with open(os.path.join(os.getcwd(), "users", "users.json"), 'w', encoding="utf-8") as file:
+        json.dump(data, file, indent=2)
+
 
 def print_menu() -> None:
-    """ Функция стартер приложения """
+    """ Главное меню приложения """
     menu_options = {
         1: 'Регистрация',
         2: 'Аутентификация',
@@ -26,14 +63,17 @@ def print_menu() -> None:
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
 
-def check_login(login: str):
+
+def check_login(login: str) -> tuple[bool, str]:
     """ Проверка логина пользователя """
-    if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha():
+    if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha() or bool(re.search('[а-яА-Я]', login)):
         return False, 'Логин введен некорректно. Повторите ввод.'
-    elif os.path.exists(os.path.join(os.getcwd(), "users", login+".txt")):
+    user, err = get_user_by_login(login)
+    if not err and user:
         return False, 'Имя пользователя уже занято. Повторите ввод.'
     else:
         return True, ''
+
 
 def check_password(password):
     # функция для проверки надежности пароля
@@ -49,9 +89,18 @@ def check_password(password):
             list_check[3] +=1
     return not list_check.count(0)
 
+def crypt_password(password) -> str:
+    """
+    Функция возвращает hash пароля
+    """
+    hash_password = hashlib.md5(password.encode()).hexdigest()
+    return hash_password
+
+
 def register():
-    global admin
-    login = input("Введите Ваш логин (только латинские буквы и цифры): ").strip()
+    """ Функция регистрации нового пользователя """
+    role = 'user'
+    login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
     check, err = check_login(login)
     if not check:
         print(err)
@@ -62,20 +111,51 @@ def register():
     while not check_password(password):
         password = input("Пароль не безопасный, введите другой: ")
 
-    hash_password = hashlib.md5(password.encode()).hexdigest()
-    with open(os.path.join(os.getcwd(), "users", login+".txt"), 'w', encoding="utf-8") as file:
-        file.writelines([f'login|{login}\n', f'password|{hash_password}\n', f'createdAt|{datetime.now()}\n'])
-    """ 
-    по запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
-    "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно
-     """
+    hash_password = crypt_password(password)
+    """ По запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
+    "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно """
     secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
-    if secretkey!="тут будет очень секретный ключ":
-        admin = True
+    if secretkey == "аз есмь царь!":
+        role = 'admin'
 
-def authentication():
+    user = {
+        'login': login,
+        'passhash': hash_password,
+        'role': role,
+        'blocked_at': '',
+        'blocked_reason': '',
+        'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        'name': '',
+        'city': '',
+    }
+    save_user_to_db(user)
+
+
+def write_post():
     pass
 
+def authentication() -> bool:
+    """
+    Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
+    В случае совпадения возвращает True
+    В случае отсутствия пользователя в базе выводит информацию на экран
+    В случае несовпадения хеша пароля выводит информацию на экран
+    Обращаю внимание, что текст ошибки должен быть идентичен, чтобы хакер не смог перебирать имена пользователей
+    """
+    flag = False
+    while not flag:
+        login = input("Введите имя пользователя: ")
+        data, err = get_user_by_login(login)
+        password = input("Введите пароль пользователя: ")
+        if data and not err:
+            if data['passhash'] == crypt_password(password):
+                print('Аутентификация прошла успешно')
+                flag = True
+            else:
+                print('Неверное имя пользователя или пароль')
+        else:
+            print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
+    return flag
 def authorization():
     pass
 
@@ -109,18 +189,23 @@ def unblock_users():
 def delete_users():
     pass
 
-def get_user_lists():
-    pass
+
+def print_users() -> None:
+    """ Функция запрашивающая список пользователей и выводящая его на печать. Когда будет присвоение ролей надо ее дописать """
+    data, err = get_users_from_db()
+    print('='*60)
+    if err:
+        print(err)
+    else:
+        for i in range(data['len']):
+            u = data['users'][i]
+            print(f'login: {u["login"]} | role: {u["role"]} | registered: {u["created_at"]}', f'blocked: {u["blocked_at"]}' if u['blocked_at'] else '')
+            print('-'*60 if i + 1 < data['len'] else '', end='\n' if i + 1 < data['len'] else '')
+    print('='*60)
+
 
 def print_branches():
-    print("Выберете ветку: ")
-    for key, value in dict_branch.items():
-        for keys, values in value.items():
-            print(f"{key}: {keys}")
-    if admin:
-        print("____________________________")
-        print(f"{len(dict_branch)+1}: Создать новую ветку")
-        print(f"{len(dict_branch) + 2}: Удалить действующую ветку")
+    pass
 
 def hacker():
     pass
@@ -128,19 +213,22 @@ def hacker():
 def finish_program():
     pass
 
+
 def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
-    global mode
     actions = {
         1: register,
         2: authentication,
-        3: get_user_lists,
+        3: print_users,
         4: print_branches,
         5: finish_program,
     }
     select = input("Выберите пункт меню: ")
     result = int(select) if select.isdigit() and 0 < int(select) < 6 else 5
-    mode = result
+    while result==5:
+        select = input(f"Введите корректно пункт меню, число от 1 до {len(actions)}: ")
+        result = int(select) if select.isdigit() and 0 < int(select) < 6 else 5
+    settings['mode'] = result
     actions[result]()
 
 
