@@ -17,6 +17,7 @@ def get_users_from_db() -> tuple[dict, str]:
     при неудаче возвращает пустой словарь и ошибку"""
     users_db = [f for f in os.listdir(os.path.join(os.getcwd(), "users", )) if '.json' in f]
     data = {}
+
     if not len(users_db):
         return data, 'База данных не найдена'
 
@@ -29,6 +30,7 @@ def get_users_from_db() -> tuple[dict, str]:
 def get_user_by_login(login: str) -> tuple[dict, str]:
     """ Функция получающая пользователя из базы по логину, если отсутствует получаем пустой словарь и ошибку """
     data, err = get_users_from_db()
+
     if err:
         return data, err
     else:
@@ -87,14 +89,12 @@ def check_password(password):
             list_check[2] +=1
         if len(password) > 5:
             list_check[3] +=1
+
     return not list_check.count(0)
 
 def crypt_password(password) -> str:
-    """
-    Функция возвращает hash пароля
-    """
-    hash_password = hashlib.md5(password.encode()).hexdigest()
-    return hash_password
+    """ Функция возвращает hash пароля """
+    return hashlib.md5(password.encode()).hexdigest()
 
 
 def register():
@@ -147,7 +147,8 @@ def authentication() -> bool:
         login = input("Введите имя пользователя: ")
         data, err = get_user_by_login(login)
         password = input("Введите пароль пользователя: ")
-        if data and not err:
+        # ToDo: можно упростить код если ошибка одинаковая
+        if data and not err: # ToDo: здесь просто добавить проверку пароля а все что else неверный логин или пароль
             if data['passhash'] == crypt_password(password):
                 print('Аутентификация прошла успешно')
                 flag = True
@@ -155,7 +156,7 @@ def authentication() -> bool:
                 print('Неверное имя пользователя или пароль')
         else:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
-    return flag
+    return flag # ToDo: не забываем о красоте кода, отступах между функциями, условиями и переменными по возможности тоже
 def authorization():
     pass
 
@@ -194,6 +195,7 @@ def print_users() -> None:
     """ Функция запрашивающая список пользователей и выводящая его на печать. Когда будет присвоение ролей надо ее дописать """
     data, err = get_users_from_db()
     print('='*60)
+
     if err:
         print(err)
     else:
