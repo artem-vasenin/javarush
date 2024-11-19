@@ -77,15 +77,28 @@ def check_login(login: str) -> tuple[bool, str]:
 def check_password(password):
     """ функция для проверки надежности пароля """
     #list_check = [0, 0, 0, 0]
-    flag = False
+    dict = [string.ascii_uppercase, string.ascii_lowercase, string.digits]
     if len(password) < 6:
-        return flag
+        return False
     else:
         for symbol in password:
-            for ranges in [string.ascii_uppercase, string.ascii_lowercase, string.digits]:
+            if dict == []:
+                flag = True
+                break
+            flag = False
+            for ranges in dict:
                 flag = flag or (symbol in ranges)
+                if flag:
+                    dict.remove(ranges)
+                    break
     return flag
 
+def crypt_password(password) -> str:
+    """
+    Функция возвращает hash пароля
+    """
+    hash_password = hashlib.md5(password.encode()).hexdigest()
+    return hash_password
 
 
 def register():
@@ -102,7 +115,7 @@ def register():
     while not check_password(password):
         password = input("Пароль не безопасный, введите другой: ")
 
-    hash_password = hashlib.md5(password.encode()).hexdigest()
+    hash_password = crypt_password(password)
     """ По запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
     "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно """
     secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
@@ -125,9 +138,28 @@ def register():
 def write_post():
     pass
 
-def authentication():
-    pass
-
+def authentication() -> bool:
+    """
+    Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
+    В случае совпадения возвращает True
+    В случае отсутствия пользователя в базе выводит информацию на экран и возвращает False
+    В случае несовпадения хеша пароля выводит информацию на экран и возвращает False
+    Обращаю внимание, что текст ошибки должен быть идентичен, чтобы хакер не смог перебирать имена пользователей
+    """
+    flag = False
+    while not flag:
+        login = input("Введите имя пользователя: ")
+        data, err = get_user_by_login(login)
+        password = input("Введите пароль пользователя: ")
+        if data and not err:
+            if data['passhash'] == crypt_password(password):
+                print('Аутентификация прошла успешно')
+                flag = True
+            else:
+                print('Неверное имя пользователя или пароль')
+        else:
+            print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
+    return flag
 def authorization():
     pass
 
