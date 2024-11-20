@@ -5,9 +5,11 @@ import os.path
 import string
 import re
 
-dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
-settings = {
-    'mode': 0,
+state = {
+    'dict_branch': {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"},
+    'route': 0,
+    # 'user': None,
+    'user': { 'login': 'Artem', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
 }
 
 
@@ -53,14 +55,51 @@ def save_user_to_db(user: dict) -> None:
         json.dump(data, file, indent=2, ensure_ascii=False)
 
 
+def get_pers_msgs(login: str = '') -> tuple[dict, str]:
+    msgs_db = [f for f in os.listdir(os.path.join(os.getcwd(), "messages", )) if '.json' in f]
+
+    if not len(msgs_db):
+        return {}, 'База данных не найдена'
+
+    with open(os.path.join(os.getcwd(), 'messages', 'messages.json'), encoding="utf-8") as file:
+        response = json.load(file)
+
+        if not response or (login and not login in response):
+            return {}, 'Список сообщений пуст'
+
+        return ({login: response[login]}, '') if login else (response, '')
+
+
+def save_personal_msg_to_db(login: str, msg: str)-> tuple[str, str]:
+    msgs, msgs_err = get_pers_msgs()
+
+    item = {
+        'from': state['user']['login'],
+        'message': msg,
+        'was_read': False,
+        'was_answered': False,
+        'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+    }
+
+    msgs[login] = [item] if (not msgs and msgs_err) or login not in msgs else [*msgs[login], item]
+
+    with open(os.path.join(os.getcwd(), "messages", "messages.json"), 'w', encoding="utf-8") as file:
+        json.dump(msgs, file, indent=2, ensure_ascii=False)
+
+    return 'Сообщение успешно отправлено', ''
+
+
 def print_menu() -> None:
     """ Главное меню приложения """
     menu_options = {
+        1: 'Просмотр списка пользователей',
+        2: 'Просмотр веток форума',
+        3: 'Написать личное сообщение',
+        4: 'Выход'
+    } if state['user'] else {
         1: 'Регистрация',
         2: 'Аутентификация',
-        3: 'Просмотр списка пользователей',
-        4: 'Просмотр веток форума',
-        5: 'Выход'
+        3: 'Завершить программу'
     }
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
@@ -78,7 +117,7 @@ def check_login(login: str) -> tuple[bool, str]:
 
 
 def check_password(password):
-    # функция для проверки надежности пароля
+    """ функция для проверки надежности пароля """
     list_check = [0, 0, 0, 0]
     for i in password:
         if i in string.ascii_uppercase:
@@ -175,8 +214,22 @@ def create_themes():
 def create_forum_messages():
     pass
 
-def create_personal_messages():
-    pass
+def send_personal_message():
+    login = input('Введите логин адресата: ')
+    _, login_err = get_user_by_login(login)
+
+    if login_err:
+        print(login_err)
+        send_personal_message()
+        return
+
+    msg = input('Ваше сообщение: ')
+    while len(msg.strip()) < 6:
+        msg = input('Хорош баловаться, введите сообщение: ')
+    result_msg, save_err = save_personal_msg_to_db(login, msg)
+
+    print(save_err if save_err else result_msg)
+
 
 def bot():
     pass
@@ -215,19 +268,26 @@ def hacker():
 def finish_program():
     pass
 
+def logout():
+    state['user'] = None
+    state['route'] = 0
+
 
 def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
     actions = {
+        1: print_users,
+        2: print_branches,
+        3: send_personal_message,
+        4: logout,
+    } if state['user'] else {
         1: register,
         2: authentication,
-        3: print_users,
-        4: print_branches,
-        5: finish_program,
+        3: finish_program,
     }
     select = input("Выберите пункт меню: ")
-    result = int(select) if select.isdigit() and 0 < int(select) < 6 else 5
-    settings['mode'] = result
+    result = int(select) if select.isdigit() and 0 < int(select) <= len(actions) else len(actions)
+    state['route'] = result
     actions[result]()
 
 
