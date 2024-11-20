@@ -4,6 +4,7 @@ import json
 import os.path
 import re
 
+# Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
 state = {
     'dict_branch': {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"},
     'route': 0,
@@ -55,6 +56,7 @@ def save_user_to_db(user: dict) -> None:
 
 
 def get_pers_msgs(login: str = '') -> tuple[dict, str]:
+    """ Функция получения всех сообщений или сообщений для конкретного пользователя """
     msgs_db = [f for f in os.listdir(os.path.join(os.getcwd(), "messages", )) if '.json' in f]
 
     if not len(msgs_db):
@@ -70,6 +72,7 @@ def get_pers_msgs(login: str = '') -> tuple[dict, str]:
 
 
 def save_personal_msg_to_db(login: str, msg: str)-> tuple[str, str]:
+    """ Сохранение нового сообщения для пользователя в базу данных """
     msgs, msgs_err = get_pers_msgs()
 
     item = {
@@ -231,6 +234,7 @@ def create_forum_messages():
     pass
 
 def send_personal_message():
+    """ Функция контроллер для работы с сообщениями пользователя """
     login = input('Введите логин адресата: ')
     _, login_err = get_user_by_login(login)
 
