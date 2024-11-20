@@ -66,28 +66,21 @@ def print_menu() -> None:
 
 def check_login(login: str) -> tuple[bool, str]:
     """ Проверка логина пользователя """
-    if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha() or bool(re.search('[а-яА-Я]', login)):
-        return False, 'Логин введен некорректно. Повторите ввод.'
+    if len(login) > 3 and re.search("^[a-zA-Z][a-zA-Z0-9]*$", login):
+        return True, ''
     user, err = get_user_by_login(login)
     if not err and user:
         return False, 'Имя пользователя уже занято. Повторите ввод.'
     else:
-        return True, ''
+        return False, 'Логин введен некорректно. Повторите ввод.'
 
 
 def check_password(password):
     # функция для проверки надежности пароля
-    list_check = [0, 0, 0, 0]
-    for i in password:
-        if i in string.ascii_uppercase:
-            list_check[0] +=1
-        if i in string.ascii_lowercase:
-            list_check[1] +=1
-        if i in string.digits:
-            list_check[2] +=1
-        if len(password) > 5:
-            list_check[3] +=1
-    return not list_check.count(0)
+    if re.search("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])^[a-zA-Z0-9]{6,}$", password):
+        return True
+    else:
+        return False
 
 def crypt_password(password) -> str:
     """
