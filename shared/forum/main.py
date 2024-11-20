@@ -7,8 +7,8 @@ import re
 state = {
     'dict_branch': {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"},
     'route': 0,
-    # 'user': None,
-    'user': { 'login': 'Artem', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
+    'user': None,
+    # 'user': { 'login': 'Artem', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
 }
 
 
