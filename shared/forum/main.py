@@ -2,7 +2,6 @@ import hashlib
 from datetime import datetime
 import json
 import os.path
-import string
 import re
 
 login_role_dict = {"login":"Lena", "role":"admin"}
@@ -80,14 +79,6 @@ def check_login(login: str) -> tuple[bool, str]:
 def check_password(password):
     # функция для проверки надежности пароля
     return re.search("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])^[a-zA-Z0-9]{6,}$", password)
-
-
-def crypt_password(password) -> str:
-    """
-    Функция возвращает hash пароля
-    """
-    hash_password = hashlib.md5(password.encode()).hexdigest()
-    return hash_password
 
 
 def crypt_password(password) -> str:
