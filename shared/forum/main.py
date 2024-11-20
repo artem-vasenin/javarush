@@ -5,7 +5,7 @@ import os.path
 import string
 import re
 
-dict_branch = {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"}
+login_role_dict = {"login":"Lena", "role":"admin"}
 settings = {
     'mode': 0,
 }
@@ -68,29 +68,27 @@ def print_menu() -> None:
 
 def check_login(login: str) -> tuple[bool, str]:
     """ Проверка логина пользователя """
-    if len(login) < 3 or not login.isalnum() or login.isdigit() or not login[0].isalpha() or bool(re.search('[а-яА-Я]', login)):
-        return False, 'Логин введен некорректно. Повторите ввод.'
     user, err = get_user_by_login(login)
     if not err and user:
         return False, 'Имя пользователя уже занято. Повторите ввод.'
-    else:
+    if len(login) > 3 and re.search("^[a-zA-Z][a-zA-Z0-9]*$", login):
         return True, ''
+    else:
+        return False, 'Логин введен некорректно. Повторите ввод.'
 
 
 def check_password(password):
     # функция для проверки надежности пароля
-    list_check = [0, 0, 0, 0]
-    for i in password:
-        if i in string.ascii_uppercase:
-            list_check[0] +=1
-        if i in string.ascii_lowercase:
-            list_check[1] +=1
-        if i in string.digits:
-            list_check[2] +=1
-        if len(password) > 5:
-            list_check[3] +=1
+    return re.search("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])^[a-zA-Z0-9]{6,}$", password)
 
-    return not list_check.count(0)
+
+def crypt_password(password) -> str:
+    """
+    Функция возвращает hash пароля
+    """
+    hash_password = hashlib.md5(password.encode()).hexdigest()
+    return hash_password
+
 
 def crypt_password(password) -> str:
     """ Функция возвращает hash пароля """
@@ -160,14 +158,41 @@ def authentication() -> bool:
 def authorization():
     pass
 
+
 def listing_branch():
-    pass
+    count = 1
+    contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
+    for i in range(len(contents)):
+        if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
+            print(f"{count}. {contents[i]}")
+            count += 1
+    if login_role_dict["role"] == "admin":
+        print("__________________________")
+        print(f"{count}. Добавить новую ветку\n{count + 1}. Удалить действующую ветку")
+    select = input("Выберите пункт меню: ")
+    check_menu_branch(select, count)
+
+
+def check_menu_branch(select, count):
+    while True:
+        if login_role_dict["role"] == "admin" and select.isdigit() and int(select)==count:
+            create_branch()
+            break
+        elif login_role_dict["role"] == "admin" and select.isdigit() and int(select)==count+1:
+            delete_branches()
+            break
+        elif select.isdigit() and 0<int(select)<count:
+            listing_themes()
+            break
+        else:
+            select = input("Выберите корректный пункт меню: ")
+
 
 def listing_themes():
-    pass
+    print("Смотрю темы")
 
 def create_branch():
-    pass
+    print("Добавляю ветку")
 
 def create_themes():
     pass
@@ -206,8 +231,9 @@ def print_users() -> None:
     print('='*60)
 
 
-def print_branches():
-    pass
+
+def delete_branches():
+    print("Удаляю ветку")
 
 def hacker():
     pass
@@ -222,11 +248,14 @@ def choose_action():
         1: register,
         2: authentication,
         3: print_users,
-        4: print_branches,
+        4: listing_branch,
         5: finish_program,
     }
     select = input("Выберите пункт меню: ")
-    result = int(select) if select.isdigit() and 0 < int(select) < 6 else 5
+    result = int(select) if select.isdigit() and 0 < int(select) < 6 else 6
+    while result==6:
+        select = input(f"Введите корректно пункт меню, число от 1 до {len(actions)}: ")
+        result = int(select) if select.isdigit() and 0 < int(select) < 6 else 6
     settings['mode'] = result
     actions[result]()
 
