@@ -302,6 +302,7 @@ def choose_action():
         2: authentication,
         3: finish_program,
     }
+
     select = input("Выберите пункт меню: ")
     result = int(select) if select.isdigit() and 0 < int(select) <= len(actions) else len(actions)
     state['route'] = result
