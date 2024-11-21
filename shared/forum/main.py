@@ -188,7 +188,7 @@ def authentication() -> bool:
                 print('Неверное имя пользователя или пароль')
         else:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
-    state['user']["login"] = login # ToDo: ошибка. Вне блока while нет переменной login
+    state['user']["login"] = login # ToDo: ошибка. Вне блока while нет переменной login, или создать ее выше или работать в контексте
     state['user']["role"] = data['role'] # ToDo: ошибка. Вне блока while нет переменной data
     print_menu()
     choose_action()
