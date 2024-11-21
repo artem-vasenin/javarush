@@ -6,7 +6,6 @@ import re
 
 # Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
 state = {
-    'dict_branch': {1: {"Погода":["Опять дождь", "Невыносимая жара", "Мороз"]}, 2:"Работа", 3:"Дети"},
     'route': 0,
     'user': {},
     # 'user': { 'login': 'Artem', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
@@ -101,7 +100,8 @@ def print_menu() -> None:
     } if state['user'] else {
         1: 'Регистрация',
         2: 'Аутентификация',
-        3: 'Завершить программу'
+        3: 'Просмотр веток форума',
+        4: 'Завершить программу'
     }
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
@@ -166,6 +166,7 @@ def write_post():
     pass
 
 def authentication() -> bool:
+    global state
     """
     Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
     В случае совпадения возвращает True
@@ -187,7 +188,12 @@ def authentication() -> bool:
                 print('Неверное имя пользователя или пароль')
         else:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
+    state['user']["login"] = login
+    state['user']["role"] = 'user'
+    print_menu()
+    choose_action()
     return flag # ToDo: не забываем о красоте кода, отступах между функциями, условиями и переменными по возможности тоже
+
 def authorization():
     pass
 
@@ -304,7 +310,8 @@ def choose_action():
     } if state['user'] else {
         1: register,
         2: authentication,
-        3: finish_program,
+        3: listing_branch,
+        4: finish_program,
     }
 
     select = input("Выберите пункт меню: ")
