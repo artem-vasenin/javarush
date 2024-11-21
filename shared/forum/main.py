@@ -175,6 +175,8 @@ def authentication() -> bool:
     Обращаю внимание, что текст ошибки должен быть идентичен, чтобы хакер не смог перебирать имена пользователей
     """
     flag = False
+    login = None
+    data = None
     while not flag:
         login = input("Введите имя пользователя: ")
         data, err = get_user_by_login(login)
@@ -188,33 +190,16 @@ def authentication() -> bool:
                 print('Неверное имя пользователя или пароль')
         else:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
-    state['user']["login"] = login # ToDo: ошибка. Вне блока while нет переменной login, или создать ее выше или работать в контексте
-    state['user']["role"] = data['role'] # ToDo: ошибка. Вне блока while нет переменной data
+
+    state['user']["login"] = login
+    state['user']["role"] = data['role']
     print_menu()
     choose_action()
-    return flag # ToDo: не забываем о красоте кода, отступах между функциями, условиями и переменными по возможности тоже
+    return flag
+
 
 def authorization():
     pass
-
-
-def listing_branch():
-    count = 1
-    # ToDo: эти проверки и получение списка бранчей я бы вынес в отдельную функцию работающую с базой а тут только получал данные или ошибку
-    contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
-    for i in range(len(contents)):
-        if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
-            print(f"{count}. {contents[i]}")
-            count += 1
-    print(f"{count}. Назад")
-    if state['user'] and state['user']["role"] == "admin":
-        print("__________________________")
-        print(f"{count+1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
-    select = input("Выберите пункт меню: ")
-    # ToDo: старайся не вызывать функции до того как их объявила и описала, тут вроде смотрю они "всплывают"
-    # ToDo: но могут быть ошибки в дальнейшем. Лучше чеккеры вынести вверх как и функции работы с базой
-    check_menu_branch(select, count)
-
 
 def check_menu_branch(select, count):
     while True:
@@ -233,6 +218,22 @@ def check_menu_branch(select, count):
             break
         else:
             select = input("Выберите корректный пункт меню: ")
+
+
+def listing_branch():
+    count = 1
+
+    contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
+    for i in range(len(contents)):
+        if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
+            print(f"{count}. {contents[i]}")
+            count += 1
+    print(f"{count}. Назад")
+    if state['user'] and state['user']["role"] == "admin":
+        print("__________________________")
+        print(f"{count+1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
+    select = input("Выберите пункт меню: ")
+    check_menu_branch(select, count)
 
 
 def listing_themes():
