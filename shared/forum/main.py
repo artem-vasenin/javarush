@@ -7,9 +7,9 @@ import re
 # Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
 state = {
     'route': 0,
-    # 'user': {},
+    'user': {},
     # 'user': { 'login': 'QWERTY', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
-    'user': { 'login': 'Admin', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
+    # 'user': { 'login': 'Admin', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
 }
 
 
@@ -126,7 +126,7 @@ def check_login(login: str) -> tuple[bool, str]:
 
 
 def check_password(password):
-    # функция для проверки надежности пароля
+    """ функция для проверки надежности пароля """
     return re.search("(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])^[a-zA-Z0-9]{6,}$", password)
 
 
@@ -136,6 +136,7 @@ def crypt_password(password) -> str:
 
 
 def return_to_main_menu():
+    """ Функция возвращающая главное меню и выбор его пункта """
     state['route'] = 0
     print_menu()
     choose_action()
@@ -368,6 +369,7 @@ def finish_program():
     pass
 
 def logout():
+    """ Функция очищающая сессию пользователя после выхода. Сюда можно добавлять и другие поля для очистки при выходе """
     state['user'] = {}
     state['route'] = 0
 
@@ -392,5 +394,4 @@ def choose_action():
     actions[result]()
 
 
-print_menu()
-choose_action()
+return_to_main_menu()
