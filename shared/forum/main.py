@@ -96,7 +96,7 @@ def print_menu() -> None:
     menu_options = {
         1: 'Просмотр списка пользователей',
         2: 'Просмотр веток форума',
-        3: 'Написать личное сообщение',
+        3: 'Личные сообщения',
         4: 'Выход'
     } if state['user'] else {
         1: 'Регистрация',
@@ -135,14 +135,20 @@ def crypt_password(password) -> str:
     return hashlib.md5(password.encode()).hexdigest()
 
 
-def register():
+def return_to_main_menu():
+    state['route'] = 0
+    print_menu()
+    choose_action()
+
+
+def register_controller():
     """ Функция регистрации нового пользователя """
     role = 'user'
     login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
     check, err = check_login(login)
     if not check:
         print(err)
-        register()
+        register_controller()
         return
 
     password = input("Введите Ваш пароль: ")
@@ -172,7 +178,7 @@ def register():
 def write_post():
     pass
 
-def authentication() -> bool:
+def authentication_controller() -> bool:
     global state
     """
     Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
@@ -226,7 +232,7 @@ def check_menu_branch(select, count):
             select = input("Выберите корректный пункт меню: ")
 
 
-def listing_branch():
+def listing_branch_controller():
     count = 1
 
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
@@ -270,6 +276,57 @@ def send_personal_message():
     result_msg, save_err = save_personal_msg_to_db(login, msg)
 
     print(save_err if save_err else result_msg)
+
+
+def print_pers_msgs(lst: list, err):
+    """ Функция оформляющая список сообщений перед выводом """
+    print('='*90)
+
+    if err:
+        print(err)
+    else:
+        if len(lst):
+            print(*[f'Отправитель: {x['from'].ljust(10)} | Дата: {x['created_at']} | "{x['message']}"' for x in lst], sep='\n')
+        else:
+            print('Сообщений пока нет')
+
+    print('='*90)
+
+
+def show_all_pers_messages():
+    """ Функция печатающая все личные сообщения пользователя """
+    data, err = get_pers_msgs(state['user']['login'])
+    print_pers_msgs(data[state['user']['login']] if not err else [], err)
+
+
+def show_new_pers_messages():
+    """ Функция печатающая новые личные сообщения пользователя """
+    data, err = get_pers_msgs(state['user']['login'])
+    print_pers_msgs(list(filter(lambda x: not x['was_read'], data[state['user']['login']])) if not err else [], err)
+
+
+def personal_messages_controller():
+    """ Функция-контроллер для функционала личных сообщений """
+    actions = {
+        1: {'title': 'Показать все сообщения', 'action': show_all_pers_messages},
+        2: {'title': 'Показать непрочитанные сообщения', 'action': show_new_pers_messages},
+        3: {'title': 'Написать личное сообщение', 'action': send_personal_message},
+        4: {'title': 'Выйти в главное меню', 'action': None},
+    }
+    print(*[f'{k}: {v['title']}' for k, v in actions.items()], sep='\n')
+
+    def check(val: str) -> bool:
+        return val.isdigit() and 0 < int(val) < 5
+
+    res = input('Сообщения. Выберите пункт меню: ')
+    while not check(res):
+        res = input('Сообщения. Выберите пункт меню. Опять...: ')
+
+    if int(res) == 4:
+        return_to_main_menu()
+        return
+
+    actions[int(res)]['action']()
 
 
 def bot():
@@ -319,13 +376,13 @@ def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
     actions = {
         1: print_users,
-        2: listing_branch,
-        3: send_personal_message,
+        2: listing_branch_controller,
+        3: personal_messages_controller,
         4: logout,
     } if state['user'] else {
-        1: register,
-        2: authentication,
-        3: listing_branch,
+        1: register_controller,
+        2: authentication_controller,
+        3: listing_branch_controller,
         4: finish_program,
     }
 
