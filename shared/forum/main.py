@@ -205,23 +205,28 @@ def listing_branch():
         if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
             print(f"{count}. {contents[i]}")
             count += 1
+    print(f"{count}. Назад")
     if state['user'] and state['user']["role"] == "admin":
         print("__________________________")
-        print(f"{count}. Добавить новую ветку\n{count + 1}. Удалить действующую ветку")
+        print(f"{count+1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
     select = input("Выберите пункт меню: ")
     check_menu_branch(select, count)
 
 
 def check_menu_branch(select, count):
     while True:
-        if state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count:
+        if state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
             create_branch()
             break
-        elif state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
+        elif state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count+2:
             delete_branches()
             break
         elif select.isdigit() and 0<int(select)<count:
             listing_themes()
+            break
+        elif select.isdigit() and int(select)==count:
+            print_menu()
+            choose_action()
             break
         else:
             select = input("Выберите корректный пункт меню: ")
