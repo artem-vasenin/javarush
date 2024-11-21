@@ -7,8 +7,9 @@ import re
 # Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
 state = {
     'route': 0,
-    'user': {},
-    # 'user': { 'login': 'Artem', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
+    # 'user': {},
+    # 'user': { 'login': 'QWERTY', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
+    'user': { 'login': 'Admin', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
 }
 
 
@@ -105,6 +106,12 @@ def print_menu() -> None:
     }
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
+
+    if state['user']:
+        msgs, err = get_pers_msgs(state['user']['login'])
+        if not err:
+            not_read = list(filter(lambda x: not x['was_read'], msgs[state['user']['login']]))
+            print(f'У вас новых сообщений {len(not_read)}. Всего {len(msgs[state['user']['login']])}.')
 
 
 def check_login(login: str) -> tuple[bool, str]:
