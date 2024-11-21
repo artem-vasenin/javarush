@@ -181,8 +181,7 @@ def authentication() -> bool:
         login = input("Введите имя пользователя: ")
         data, err = get_user_by_login(login)
         password = input("Введите пароль пользователя: ")
-        # ToDo: можно упростить код если ошибка одинаковая
-        if data and not err: # ToDo: здесь просто добавить проверку пароля а все что else неверный логин или пароль
+        if data and not err:
             if data['passhash'] == crypt_password(password):
                 print('Аутентификация прошла успешно')
                 flag = True
