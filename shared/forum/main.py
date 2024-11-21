@@ -189,7 +189,7 @@ def authentication() -> bool:
         else:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
     state['user']["login"] = login
-    state['user']["role"] = 'user'
+    state['user']["role"] = data['role']
     print_menu()
     choose_action()
     return flag # ToDo: не забываем о красоте кода, отступах между функциями, условиями и переменными по возможности тоже
