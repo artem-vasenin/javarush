@@ -188,8 +188,8 @@ def authentication() -> bool:
                 print('Неверное имя пользователя или пароль')
         else:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
-    state['user']["login"] = login
-    state['user']["role"] = data['role']
+    state['user']["login"] = login # ToDo: ошибка. Вне блока while нет переменной login
+    state['user']["role"] = data['role'] # ToDo: ошибка. Вне блока while нет переменной data
     print_menu()
     choose_action()
     return flag # ToDo: не забываем о красоте кода, отступах между функциями, условиями и переменными по возможности тоже
@@ -200,6 +200,7 @@ def authorization():
 
 def listing_branch():
     count = 1
+    # ToDo: эти проверки и получение списка бранчей я бы вынес в отдельную функцию работающую с базой а тут только получал данные или ошибку
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
     for i in range(len(contents)):
         if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
@@ -210,6 +211,8 @@ def listing_branch():
         print("__________________________")
         print(f"{count+1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
     select = input("Выберите пункт меню: ")
+    # ToDo: старайся не вызывать функции до того как их объявила и описала, тут вроде смотрю они "всплывают"
+    # ToDo: но могут быть ошибки в дальнейшем. Лучше чеккеры вынести вверх как и функции работы с базой
     check_menu_branch(select, count)
 
 
