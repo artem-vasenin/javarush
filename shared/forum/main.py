@@ -8,9 +8,23 @@ import re
 state = {
     'route': 0,
     # 'user': {},
-    # 'user': { 'login': 'QWERTY', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
-    'user': { 'login': 'Admin', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
+    'user': { 'login': 'QWERTY', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
+    # 'user': { 'login': 'Admin', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
 }
+
+
+def print_list_decorator(length=60, symbol='='):
+    """ Декоратор для печати списков. Должен оборачивать функции возвращающие список строк из 1 и более элементов """
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            lst = func(*args, **kwargs)
+            print(symbol * length)
+            for i in range(len(lst)):
+                print(lst[i])
+                print('-' * length) if not i + 1 == len(lst) else None
+            print(symbol * length)
+        return wrapper
+    return decorator
 
 
 def get_users_from_db() -> tuple[dict, str]:
@@ -278,19 +292,16 @@ def send_personal_message():
     print(save_err if save_err else result_msg)
 
 
-def print_pers_msgs(lst: list, err):
+@print_list_decorator(length=90)
+def print_pers_msgs(lst: list, err) -> list[str]:
     """ Функция оформляющая список сообщений перед выводом """
-    print('='*90)
-
     if err:
-        print(err)
+        return [err]
     else:
         if len(lst):
-            print(*[f'Отправитель: {x['from'].ljust(10)} | Дата: {x['created_at']} | "{x['message']}"' for x in lst], sep='\n')
+            return [f'Отправитель: {x['from'].ljust(10)} | Дата: {x['created_at']} | "{x['message']}"' for x in lst]
         else:
-            print('Сообщений пока нет')
-
-    print('='*90)
+            return ['Сообщений пока нет']
 
 
 def show_all_pers_messages():
@@ -342,19 +353,20 @@ def delete_users():
     pass
 
 
-def print_users() -> None:
+@print_list_decorator()
+def print_users() -> list[str]:
     """ Функция запрашивающая список пользователей и выводящая его на печать. Когда будет присвоение ролей надо ее дописать """
     data, err = get_users_from_db()
-    print('='*60)
-
     if err:
-        print(err)
+        return [err]
     else:
+        lst = []
         for i in range(data['len']):
             u = data['users'][i]
-            print(f'login: {u["login"]} | role: {u["role"]} | registered: {u["created_at"]}', f'blocked: {u["blocked_at"]}' if u['blocked_at'] else '')
-            print('-'*60 if i + 1 < data['len'] else '', end='\n' if i + 1 < data['len'] else '')
-    print('='*60)
+            blocked = f' blocked: {u["blocked_at"]}' if u['blocked_at'] else ''
+            lst.append(f'login: {u["login"]} | role: {u["role"]} | registered: {u["created_at"]}{blocked}')
+
+        return lst
 
 
 
