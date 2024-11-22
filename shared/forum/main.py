@@ -7,9 +7,9 @@ import re
 # Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
 state = {
     'route': 0,
-    'user': {},
+    # 'user': {},
     # 'user': { 'login': 'QWERTY', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
-    # 'user': { 'login': 'Admin', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
+    'user': { 'login': 'Admin', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
 }
 
 
@@ -226,8 +226,7 @@ def check_menu_branch(select, count):
             listing_themes()
             break
         elif select.isdigit() and int(select)==count:
-            print_menu()
-            choose_action()
+            return_to_main_menu()
             break
         else:
             select = input("Выберите корректный пункт меню: ")
