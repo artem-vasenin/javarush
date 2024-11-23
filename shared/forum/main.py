@@ -6,6 +6,7 @@ import re
 
 # Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
 state = {
+    'branch': {'1': 'Pogoda', '2': 'Rabota'},
     'route': 0,
     # 'user': {},
     'user': { 'login': 'QWERTY', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
@@ -229,6 +230,7 @@ def authorization():
     pass
 
 def check_menu_branch(select, count):
+    """ функция проверки введенных данный в меню branch  """
     while True:
         if state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
             create_branch()
@@ -237,7 +239,7 @@ def check_menu_branch(select, count):
             delete_branches()
             break
         elif select.isdigit() and 0<int(select)<count:
-            listing_themes()
+            listing_themes(select)
             break
         elif select.isdigit() and int(select)==count:
             return_to_main_menu()
@@ -246,9 +248,9 @@ def check_menu_branch(select, count):
             select = input("Выберите корректный пункт меню: ")
 
 
-def listing_branch_controller():
+def print_branch():
+    """ Функция печатающая меню бранчей """
     count = 1
-
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
     for i in range(len(contents)):
         if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
@@ -257,13 +259,20 @@ def listing_branch_controller():
     print(f"{count}. Назад")
     if state['user'] and state['user']["role"] == "admin":
         print("__________________________")
-        print(f"{count+1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
+        print(f"{count + 1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
+    return count
+
+
+def listing_branch_controller():
+    """ Функция контроллер для меню бранчей """
+    count = print_branch()
     select = input("Выберите пункт меню: ")
     check_menu_branch(select, count)
 
 
-def listing_themes():
-    print("Смотрю темы")
+def listing_themes(select):
+    branch = state['branch'][select]
+    print(f"\nТемы ветки '{branch}': ")
 
 def create_branch():
     print("Добавляю ветку")
