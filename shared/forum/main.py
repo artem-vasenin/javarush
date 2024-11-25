@@ -4,105 +4,16 @@ import json
 import os.path
 import re
 
+from shared.forum.messages.get_pers_msgs import get_pers_msgs
+from shared.forum.messages.personal_messages_controller import personal_messages_controller
+from shared.forum.users import get_user_by_login, save_user_to_db, print_users
+
 # Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
 state = {
     'branch': {},
     'route': 0,
     'user': {},
 }
-
-
-def print_list_decorator(length=60, symbol='='):
-    """ Декоратор для печати списков. Должен оборачивать функции возвращающие список строк из 1 и более элементов """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            lst = func(*args, **kwargs)
-            print(symbol * length)
-            for i in range(len(lst)):
-                print(lst[i])
-                print('-' * length) if not i + 1 == len(lst) else None
-            print(symbol * length)
-        return wrapper
-    return decorator
-
-
-def get_users_from_db() -> tuple[dict, str]:
-    """ Функция получающая всех пользователей из базы. При успехе возвращает словарь с полями
-    {users: [{...}], len: int}
-    при неудаче возвращает пустой словарь и ошибку"""
-    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), "users", )) if '.json' in f]
-    data = {}
-
-    if not len(users_db):
-        return data, 'База данных не найдена'
-
-    with open(os.path.join(os.getcwd(), 'users', 'users.json'), encoding="utf-8") as file:
-        data = json.load(file)
-
-    return (data, '') if data else (data, 'Список пользователей пуст')
-
-
-def get_user_by_login(login: str) -> tuple[dict, str]:
-    """ Функция получающая пользователя из базы по логину, если отсутствует получаем пустой словарь и ошибку """
-    data, err = get_users_from_db()
-
-    if err:
-        return data, err
-    else:
-        lst = [x for x in data['users'] if x['login'] == login]
-        return (lst[0], '') if lst else ({}, 'Пользователь не найден')
-
-
-def save_user_to_db(user: dict) -> None:
-    """ Функция записи пользователя в базу данных """
-    data, error = get_users_from_db()
-
-    if error and not data:
-        data['users'] = [user]
-        data['len'] = 1
-    else:
-        data['users'].append(user)
-        data['len'] = len(data['users'])
-
-    with open(os.path.join(os.getcwd(), "users", "users.json"), 'w', encoding="utf-8") as file:
-        json.dump(data, file, indent=2, ensure_ascii=False)
-
-
-def get_pers_msgs(login: str = '') -> tuple[dict, str]:
-    """ Функция получения всех сообщений или сообщений для конкретного пользователя """
-    msgs_db = [f for f in os.listdir(os.path.join(os.getcwd(), "messages", )) if '.json' in f]
-
-    if not len(msgs_db):
-        return {}, 'База данных не найдена'
-
-    with open(os.path.join(os.getcwd(), 'messages', 'messages.json'), encoding="utf-8") as file:
-        response = json.load(file)
-
-        if not response or (login and not login in response):
-            return {}, 'Список сообщений пуст'
-
-        return ({login: response[login]}, '') if login else (response, '')
-
-
-def save_personal_msg_to_db(login: str, msg: str)-> tuple[str, str]:
-    """ Сохранение нового сообщения для пользователя в базу данных """
-    msgs, msgs_err = get_pers_msgs()
-
-    item = {
-        'from': state['user']['login'],
-        'message': msg,
-        'was_read': False,
-        'was_answered': False,
-        'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-    }
-
-    msgs[login] = [item] if (not msgs and msgs_err) or login not in msgs else [*msgs[login], item]
-
-    with open(os.path.join(os.getcwd(), "messages", "messages.json"), 'w', encoding="utf-8") as file:
-        json.dump(msgs, file, indent=2, ensure_ascii=False)
-
-    return 'Сообщение успешно отправлено', ''
-
 
 def print_menu() -> None:
     """ Главное меню приложения """
@@ -308,72 +219,6 @@ def create_themes():
 def create_forum_messages():
     pass
 
-def send_personal_message():
-    """ Функция контроллер для работы с сообщениями пользователя """
-    login = input('Введите логин адресата: ')
-    _, login_err = get_user_by_login(login)
-
-    if login_err:
-        print(login_err)
-        send_personal_message()
-        return
-
-    msg = input('Ваше сообщение: ')
-    while len(msg.strip()) < 6:
-        msg = input('Хорош баловаться, введите сообщение: ')
-    result_msg, save_err = save_personal_msg_to_db(login, msg)
-
-    print(save_err if save_err else result_msg)
-
-
-@print_list_decorator(length=90)
-def print_pers_msgs(lst: list, err) -> list[str]:
-    """ Функция оформляющая список сообщений перед выводом """
-    if err:
-        return [err]
-    else:
-        if len(lst):
-            return [f'Отправитель: {x['from'].ljust(10)} | Дата: {x['created_at']} | "{x['message']}"' for x in lst]
-        else:
-            return ['Сообщений пока нет']
-
-
-def show_all_pers_messages():
-    """ Функция печатающая все личные сообщения пользователя """
-    data, err = get_pers_msgs(state['user']['login'])
-    print_pers_msgs(data[state['user']['login']] if not err else [], err)
-
-
-def show_new_pers_messages():
-    """ Функция печатающая новые личные сообщения пользователя """
-    data, err = get_pers_msgs(state['user']['login'])
-    print_pers_msgs(list(filter(lambda x: not x['was_read'], data[state['user']['login']])) if not err else [], err)
-
-
-def personal_messages_controller():
-    """ Функция-контроллер для функционала личных сообщений """
-    actions = {
-        1: {'title': 'Показать все сообщения', 'action': show_all_pers_messages},
-        2: {'title': 'Показать непрочитанные сообщения', 'action': show_new_pers_messages},
-        3: {'title': 'Написать личное сообщение', 'action': send_personal_message},
-        4: {'title': 'Выйти в главное меню', 'action': None},
-    }
-    print(*[f'{k}: {v['title']}' for k, v in actions.items()], sep='\n')
-
-    def check(val: str) -> bool:
-        return val.isdigit() and 0 < int(val) < 5
-
-    res = input('Сообщения. Выберите пункт меню: ')
-    while not check(res):
-        res = input('Сообщения. Выберите пункт меню. Опять...: ')
-
-    if int(res) == 4:
-        return_to_main_menu()
-        return
-
-    actions[int(res)]['action']()
-
-
 def bot():
     pass
 
@@ -385,24 +230,6 @@ def unblock_users():
 
 def delete_users():
     pass
-
-
-@print_list_decorator()
-def print_users() -> list[str]:
-    """ Функция запрашивающая список пользователей и выводящая его на печать. Когда будет присвоение ролей надо ее дописать """
-    data, err = get_users_from_db()
-    if err:
-        return [err]
-    else:
-        lst = []
-        for i in range(data['len']):
-            u = data['users'][i]
-            blocked = f' blocked: {u["blocked_at"]}' if u['blocked_at'] else ''
-            lst.append(f'login: {u["login"]} | role: {u["role"]} | registered: {u["created_at"]}{blocked}')
-
-        return lst
-
-
 
 def delete_branches():
     print("Удаляю ветку")
@@ -421,10 +248,13 @@ def logout():
 
 def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
+    def get_pers_msgs_controller():
+        personal_messages_controller(state['user']['login'], return_to_main_menu)
+
     actions = {
         1: print_users,
         2: listing_branch_controller,
-        3: personal_messages_controller,
+        3: get_pers_msgs_controller,
         4: logout,
     } if state['user'] else {
         1: register_controller,
