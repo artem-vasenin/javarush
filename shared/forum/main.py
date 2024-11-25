@@ -6,11 +6,9 @@ import re
 
 # Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
 state = {
-    'branch': {'1': 'Pogoda', '2': 'Rabota'},
+    'branch': {},
     'route': 0,
-    # 'user': {},
-    'user': { 'login': 'QWERTY', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
-    # 'user': { 'login': 'Admin', 'role': 'admin', 'logged_at': '2024-11-19 10:15:39' },
+    'user': {},
 }
 
 
@@ -231,6 +229,8 @@ def authorization():
 
 def check_menu_branch(select, count):
     """ функция проверки введенных данный в меню branch  """
+    global state
+
     while True:
         if state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
             create_branch()
@@ -239,7 +239,9 @@ def check_menu_branch(select, count):
             delete_branches()
             break
         elif select.isdigit() and 0<int(select)<count:
-            listing_themes(select)
+            tema = state["branch"][int(select)]
+            state["branch"] = tema
+            listing_themes()
             break
         elif select.isdigit() and int(select)==count:
             return_to_main_menu()
@@ -255,6 +257,7 @@ def print_branch():
     for i in range(len(contents)):
         if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
             print(f"{count}. {contents[i]}")
+            state["branch"][count] = contents[i]
             count += 1
     print(f"{count}. Назад")
     if state['user'] and state['user']["role"] == "admin":
@@ -270,9 +273,31 @@ def listing_branch_controller():
     check_menu_branch(select, count)
 
 
-def listing_themes(select):
-    branch = state['branch'][select]
-    print(f"\nТемы ветки '{branch}': ")
+def get_branches_from_db() -> tuple[dict, str]:
+    """ Функция получающая содержание текущей ветки. При успехе возвращает словарь
+    при неудаче возвращает пустой словарь и ошибку"""
+    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', state["branch"], )) if '.json' in f]
+    data = {}
+
+    if not len(users_db):
+        return data, 'База данных не найдена'
+
+    with open(os.path.join(os.getcwd(), 'branches', state["branch"], 'themes.json'), encoding="utf-8") as file:
+        data = json.load(file)
+
+    return (data, '') if data["branch_name"]["themes"] else (data, 'Список тем пуст')
+
+
+def listing_themes():
+    """ функция печатающая список тем в выбранной ветке """
+    data, err = get_branches_from_db()
+    print(f"\nТемы ветки '{data["branch_name"]["title"]}': ")
+    if err:
+        print(err)
+    else:
+        for i in range(len(data["branch_name"]["themes"])):
+            print(f"{i+1}. {data["branch_name"]["themes"][i]["title_themes"]}")
+
 
 def create_branch():
     print("Добавляю ветку")
