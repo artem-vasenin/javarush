@@ -289,7 +289,7 @@ def get_branches_from_db() -> tuple[dict, str]:
 
 
 def listing_themes():
-    """ функция печатающая список тем в выбранной ветке """
+    """ функция печатающая список тем в выбранной ветки """
     data, err = get_branches_from_db()
     print(f"\nТемы ветки '{data["branch_name"]["title"]}': ")
     if err:
