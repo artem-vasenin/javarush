@@ -5,8 +5,7 @@ import os.path
 import utils.utils as ut
 import users.user as user
 import app.app as app
-
-
+import branches.forum as forum
 
 
 def get_pers_msgs(login: str = '') -> tuple[dict, str]:
@@ -90,102 +89,12 @@ def register_controller():
     choose_action()
 
 
-def write_post():
-    pass
-
-
-def check_menu_branch(select, count):
-    """ функция проверки введенных данный в меню branch  """
-    st = app.get_state()
-    is_admin = st.get('user') and st['user']["role"] == "admin"
-
-    while True:
-        if is_admin and select.isdigit() and int(select)==count+1:
-            create_branch()
-            break
-        elif is_admin and select.isdigit() and int(select)==count+2:
-            delete_branches()
-            break
-        elif st.get('branch') and select.isdigit() and 0<int(select)<count:
-            branch = st.get('branch')
-            print(branch, select)
-            if branch.get(select):
-                theme = branch[select]
-                app.save_state('branch', theme)
-                listing_themes()
-            else:
-                print('Ошибка получения темы')
-            break
-        elif select.isdigit() and int(select)==count:
-            return_to_main_menu()
-            break
-        else:
-            select = input("Выберите корректный пункт меню: ")
-
-
-def print_branch():
-    """ Функция печатающая меню бранчей """
-    st = app.get_state()
-    count = 1
-    dirs = os.listdir(os.path.join(os.getcwd(), 'branches'))
-    dct = {}
-    for i in range(len(dirs)):
-        if os.path.isdir(os.path.join(os.getcwd(), 'branches', dirs[i])):
-            print(f"{count}. {dirs[i]}")
-            dct[count] = dirs[i]
-            count += 1
-    app.save_state('branch', dct)
-    print(f"{count}. Назад")
-    if st.get('user') and st['user']["role"] == "admin":
-        print("_"*40)
-        print(f"{count + 1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
-    return count
-
-
 def listing_branch_controller():
     """ Функция контроллер для меню бранчей """
-    count = print_branch()
+    count = forum.print_branch()
     select = input("Выберите пункт меню: ")
-    check_menu_branch(select, count)
+    forum.check_menu_branch(select, count)
 
-
-def get_branches_from_db() -> tuple[dict, str]:
-    """ Функция получающая содержание текущей ветки. При успехе возвращает словарь
-    при неудаче возвращает пустой словарь и ошибку"""
-    st = app.get_state()
-    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', st.get("branch"), )) if '.json' in f]
-    data = {}
-
-    if not len(users_db):
-        return data, 'База данных не найдена'
-
-    with open(os.path.join(os.getcwd(), 'branches', st.get("branch"), 'themes.json'), encoding="utf-8") as file:
-        data = json.load(file)
-
-    return (data, '') if data["branch_name"]["themes"] else (data, 'Список тем пуст')
-
-
-@ut.print_list_decorator()
-def listing_themes():
-    """ функция печатающая список тем в выбранной ветки """
-    data, err = get_branches_from_db()
-    print(f"\nТемы ветки '{data["branch_name"]["title"]}': ")
-    if err:
-        return [err]
-    else:
-        themes = data["branch_name"]["themes"]
-        return [f"{i+1}. {themes[i]["title_themes"]}" for i in range(len(themes))]
-
-
-
-def create_branch():
-    print("Добавляю ветку")
-
-def create_themes():
-    pass
-
-def create_forum_messages():
-    pass
 
 def send_personal_message():
     """ Функция контроллер для работы с сообщениями пользователя """
@@ -282,11 +191,6 @@ def print_users() -> list[str]:
             lst.append(f'login: {u["login"]} | role: {u["role"]} | registered: {u["created_at"]}{blocked}')
 
         return lst
-
-
-
-def delete_branches():
-    print("Удаляю ветку")
 
 def hacker():
     pass

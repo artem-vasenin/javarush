@@ -19,6 +19,5 @@ def save_state(key: str = '', value = None) -> None:
 
     if key and value:
         data[key] = value
-    print(key, value)
     with open(os.path.join(os.getcwd(), "app", "app.json"), 'w', encoding="utf-8") as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
