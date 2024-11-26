@@ -177,7 +177,6 @@ def write_post():
     pass
 
 def authentication_controller() -> bool:
-    st = app.get_state()
     """
     Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
     В случае совпадения возвращает True
@@ -215,15 +214,15 @@ def check_menu_branch(select, count):
     st = app.get_state()
 
     while True:
-        if st['user'] and st['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
+        if st.get('user') and st['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
             create_branch()
             break
-        elif st['user'] and st['user']["role"] == "admin" and select.isdigit() and int(select)==count+2:
+        elif st.get('user') and st['user']["role"] == "admin" and select.isdigit() and int(select)==count+2:
             delete_branches()
             break
-        elif select.isdigit() and 0<int(select)<count:
-            tema = st["branch"][int(select)]
-            st["branch"] = tema
+        elif st.get('branch') and select.isdigit() and 0<int(select)<count:
+            theme = st["branch"][select]
+            app.save_state('branch', theme)
             listing_themes()
             break
         elif select.isdigit() and int(select)==count:
@@ -241,7 +240,7 @@ def print_branch():
     for i in range(len(contents)):
         if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
             print(f"{count}. {contents[i]}")
-            st["branch"][count] = contents[i]
+            app.save_state('branch', {count: contents[i]})
             count += 1
     print(f"{count}. Назад")
     if st['user'] and st['user']["role"] == "admin":
@@ -261,13 +260,13 @@ def get_branches_from_db() -> tuple[dict, str]:
     """ Функция получающая содержание текущей ветки. При успехе возвращает словарь
     при неудаче возвращает пустой словарь и ошибку"""
     st = app.get_state()
-    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', st["branch"], )) if '.json' in f]
+    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', st.get("branch"), )) if '.json' in f]
     data = {}
 
     if not len(users_db):
         return data, 'База данных не найдена'
 
-    with open(os.path.join(os.getcwd(), 'branches', st["branch"], 'themes.json'), encoding="utf-8") as file:
+    with open(os.path.join(os.getcwd(), 'branches', st.get("branch"), 'themes.json'), encoding="utf-8") as file:
         data = json.load(file)
 
     return (data, '') if data["branch_name"]["themes"] else (data, 'Список тем пуст')
