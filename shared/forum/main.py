@@ -1,5 +1,6 @@
 import json
 import os.path
+
 from globals import state
 
 from shared.forum.messages.get_pers_msgs import get_pers_msgs
@@ -40,7 +41,6 @@ def write_post():
     pass
 
 def authentication_controller() -> bool:
-    global state
     """
     Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
     В случае совпадения возвращает True
@@ -65,8 +65,7 @@ def authentication_controller() -> bool:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
     state['user']["login"] = login
     state['user']["role"] = data['role']
-    print_menu()
-    choose_action()
+    return_to_main_menu()
     return flag
 
 
@@ -75,7 +74,6 @@ def authorization():
 
 def check_menu_branch(select, count):
     """ функция проверки введенных данный в меню branch  """
-    global state
 
     while True:
         if state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
@@ -102,7 +100,8 @@ def print_branch():
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
     print(len(contents))
     for i in range(len(contents)):
-        if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])) and len(os.listdir(os.path.join(os.getcwd(), 'branches', contents[i])))==1:
+        file_path = os.path.join(os.getcwd(), 'branches', contents[i], 'themes.json')
+        if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])) and os.path.exists(file_path):
             with open(os.path.join(os.getcwd(), 'branches', contents[i], 'themes.json'), encoding="utf-8") as file:
                 data = json.load(file)
             state["branch"][count] = contents[i]
