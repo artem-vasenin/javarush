@@ -5,6 +5,7 @@ import hashlib
 from datetime import datetime
 
 import shared.forum.app.app as app
+import shared.forum.utils.utils as ut
 
 
 def get_users_from_db() -> tuple[dict, str]:
@@ -129,3 +130,19 @@ def authentication() -> None:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
 
     app.save_state('user', {'login': login, 'role': data['role']})
+
+
+@ut.print_list_decorator()
+def print_users() -> list[str]:
+    """ Функция запрашивающая список пользователей и выводящая его на печать. Когда будет присвоение ролей надо ее дописать """
+    data, err = get_users_from_db()
+    if err:
+        return [err]
+    else:
+        lst = []
+        for i in range(data['len']):
+            u = data['users'][i]
+            blocked = f' blocked: {u["blocked_at"]}' if u['blocked_at'] else ''
+            lst.append(f'login: {u["login"]} | role: {u["role"]} | registered: {u["created_at"]}{blocked}')
+
+        return lst
