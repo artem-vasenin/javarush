@@ -167,9 +167,12 @@ def print_branch():
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
     for i in range(len(contents)):
         if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
-            print(f"{count}. {contents[i]}")
+            with open(os.path.join(os.getcwd(), 'branches', contents[i], 'themes.json'), encoding="utf-8") as file:
+                data = json.load(file)
             state["branch"][count] = contents[i]
+            print(f"{count}. {data["branch_name"]["title"]}")
             count += 1
+    print("__________________________")
     print(f"{count}. Назад")
     if state['user'] and state['user']["role"] == "admin":
         print("__________________________")
