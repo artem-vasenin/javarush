@@ -1,16 +1,11 @@
 import json
 import os.path
-
+from globals import state
 
 from shared.forum.messages.get_pers_msgs import get_pers_msgs
 from shared.forum.messages.personal_messages_controller import personal_messages_controller
 from shared.forum.users import get_user_by_login, print_users, check_login, check_password, crypt_password, register_controller
 # Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
-state = {
-    'branch': {},
-    'route': 0,
-    'user': {},
-}
 
 def print_menu() -> None:
     """ Главное меню приложения """
