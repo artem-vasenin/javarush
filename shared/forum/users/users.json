@@ -59,7 +59,17 @@
       "created_at": "2024-11-20 23:45:56",
       "name": "",
       "city": ""
+    },
+    {
+      "login": "Rusich",
+      "passhash": "92180c5faaa5b69d2d416a70a3897d3a",
+      "role": "user",
+      "blocked_at": "",
+      "blocked_reason": "",
+      "created_at": "2024-11-26 20:54:18",
+      "name": "",
+      "city": ""
     }
   ],
-  "len": 6
+  "len": 7
 }

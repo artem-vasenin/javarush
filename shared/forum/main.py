@@ -4,26 +4,9 @@ import json
 import os.path
 import re
 
-# Состояние приложения. Пишем сюда данные авторизованного пользователя и всякие флаги
-state = {
-    'branch': {},
-    'route': 0,
-    'user': {},
-}
-
-
-def print_list_decorator(length=60, symbol='='):
-    """ Декоратор для печати списков. Должен оборачивать функции возвращающие список строк из 1 и более элементов """
-    def decorator(func):
-        def wrapper(*args, **kwargs):
-            lst = func(*args, **kwargs)
-            print(symbol * length)
-            for i in range(len(lst)):
-                print(lst[i])
-                print('-' * length) if not i + 1 == len(lst) else None
-            print(symbol * length)
-        return wrapper
-    return decorator
+import utils.utils as ut
+import users.user
+import app.app as app
 
 
 def get_users_from_db() -> tuple[dict, str]:
@@ -86,10 +69,11 @@ def get_pers_msgs(login: str = '') -> tuple[dict, str]:
 
 def save_personal_msg_to_db(login: str, msg: str)-> tuple[str, str]:
     """ Сохранение нового сообщения для пользователя в базу данных """
+    st = app.get_state()
     msgs, msgs_err = get_pers_msgs()
 
     item = {
-        'from': state['user']['login'],
+        'from': st['user']['login'],
         'message': msg,
         'was_read': False,
         'was_answered': False,
@@ -106,12 +90,13 @@ def save_personal_msg_to_db(login: str, msg: str)-> tuple[str, str]:
 
 def print_menu() -> None:
     """ Главное меню приложения """
+    st = app.get_state()
     menu_options = {
         1: 'Просмотр списка пользователей',
         2: 'Просмотр веток форума',
         3: 'Личные сообщения',
         4: 'Выход'
-    } if state['user'] else {
+    } if st.get('user') else {
         1: 'Регистрация',
         2: 'Аутентификация',
         3: 'Просмотр веток форума',
@@ -120,11 +105,11 @@ def print_menu() -> None:
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
 
-    if state['user']:
-        msgs, err = get_pers_msgs(state['user']['login'])
+    if st.get('user'):
+        msgs, err = get_pers_msgs(st['user']['login'])
         if not err:
-            not_read = list(filter(lambda x: not x['was_read'], msgs[state['user']['login']]))
-            print(f'У вас новых сообщений {len(not_read)}. Всего {len(msgs[state['user']['login']])}.')
+            not_read = list(filter(lambda x: not x['was_read'], msgs[st['user']['login']]))
+            print(f'У вас новых сообщений {len(not_read)}. Всего {len(msgs[st['user']['login']])}.')
 
 
 def check_login(login: str) -> tuple[bool, str]:
@@ -150,7 +135,6 @@ def crypt_password(password) -> str:
 
 def return_to_main_menu():
     """ Функция возвращающая главное меню и выбор его пункта """
-    state['route'] = 0
     print_menu()
     choose_action()
 
@@ -193,7 +177,7 @@ def write_post():
     pass
 
 def authentication_controller() -> bool:
-    global state
+    st = app.get_state()
     """
     Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
     В случае совпадения возвращает True
@@ -217,8 +201,7 @@ def authentication_controller() -> bool:
         else:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
 
-    state['user']["login"] = login
-    state['user']["role"] = data['role']
+    app.save_state('user', {'login': login, 'role': data['role']})
     print_menu()
     choose_action()
     return flag
@@ -229,18 +212,18 @@ def authorization():
 
 def check_menu_branch(select, count):
     """ функция проверки введенных данный в меню branch  """
-    global state
+    st = app.get_state()
 
     while True:
-        if state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
+        if st['user'] and st['user']["role"] == "admin" and select.isdigit() and int(select)==count+1:
             create_branch()
             break
-        elif state['user'] and state['user']["role"] == "admin" and select.isdigit() and int(select)==count+2:
+        elif st['user'] and st['user']["role"] == "admin" and select.isdigit() and int(select)==count+2:
             delete_branches()
             break
         elif select.isdigit() and 0<int(select)<count:
-            tema = state["branch"][int(select)]
-            state["branch"] = tema
+            tema = st["branch"][int(select)]
+            st["branch"] = tema
             listing_themes()
             break
         elif select.isdigit() and int(select)==count:
@@ -252,15 +235,16 @@ def check_menu_branch(select, count):
 
 def print_branch():
     """ Функция печатающая меню бранчей """
+    st = app.get_state()
     count = 1
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
     for i in range(len(contents)):
         if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
             print(f"{count}. {contents[i]}")
-            state["branch"][count] = contents[i]
+            st["branch"][count] = contents[i]
             count += 1
     print(f"{count}. Назад")
-    if state['user'] and state['user']["role"] == "admin":
+    if st['user'] and st['user']["role"] == "admin":
         print("__________________________")
         print(f"{count + 1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
     return count
@@ -276,13 +260,14 @@ def listing_branch_controller():
 def get_branches_from_db() -> tuple[dict, str]:
     """ Функция получающая содержание текущей ветки. При успехе возвращает словарь
     при неудаче возвращает пустой словарь и ошибку"""
-    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', state["branch"], )) if '.json' in f]
+    st = app.get_state()
+    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', st["branch"], )) if '.json' in f]
     data = {}
 
     if not len(users_db):
         return data, 'База данных не найдена'
 
-    with open(os.path.join(os.getcwd(), 'branches', state["branch"], 'themes.json'), encoding="utf-8") as file:
+    with open(os.path.join(os.getcwd(), 'branches', st["branch"], 'themes.json'), encoding="utf-8") as file:
         data = json.load(file)
 
     return (data, '') if data["branch_name"]["themes"] else (data, 'Список тем пуст')
@@ -326,7 +311,7 @@ def send_personal_message():
     print(save_err if save_err else result_msg)
 
 
-@print_list_decorator(length=90)
+@ut.print_list_decorator(length=90)
 def print_pers_msgs(lst: list, err) -> list[str]:
     """ Функция оформляющая список сообщений перед выводом """
     if err:
@@ -340,14 +325,16 @@ def print_pers_msgs(lst: list, err) -> list[str]:
 
 def show_all_pers_messages():
     """ Функция печатающая все личные сообщения пользователя """
-    data, err = get_pers_msgs(state['user']['login'])
-    print_pers_msgs(data[state['user']['login']] if not err else [], err)
+    st = app.get_state()
+    data, err = get_pers_msgs(st['user']['login'])
+    print_pers_msgs(data[st['user']['login']] if not err else [], err)
 
 
 def show_new_pers_messages():
     """ Функция печатающая новые личные сообщения пользователя """
-    data, err = get_pers_msgs(state['user']['login'])
-    print_pers_msgs(list(filter(lambda x: not x['was_read'], data[state['user']['login']])) if not err else [], err)
+    st = app.get_state()
+    data, err = get_pers_msgs(st['user']['login'])
+    print_pers_msgs(list(filter(lambda x: not x['was_read'], data[st['user']['login']])) if not err else [], err)
 
 
 def personal_messages_controller():
@@ -387,7 +374,7 @@ def delete_users():
     pass
 
 
-@print_list_decorator()
+@ut.print_list_decorator()
 def print_users() -> list[str]:
     """ Функция запрашивающая список пользователей и выводящая его на печать. Когда будет присвоение ролей надо ее дописать """
     data, err = get_users_from_db()
@@ -415,18 +402,18 @@ def finish_program():
 
 def logout():
     """ Функция очищающая сессию пользователя после выхода. Сюда можно добавлять и другие поля для очистки при выходе """
-    state['user'] = {}
-    state['route'] = 0
+    app.save_state()
 
 
 def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
+    st = app.get_state()
     actions = {
         1: print_users,
         2: listing_branch_controller,
         3: personal_messages_controller,
         4: logout,
-    } if state['user'] else {
+    } if st.get('user') else {
         1: register_controller,
         2: authentication_controller,
         3: listing_branch_controller,
@@ -435,8 +422,8 @@ def choose_action():
 
     select = input("Выберите пункт меню: ")
     result = int(select) if select.isdigit() and 0 < int(select) <= len(actions) else len(actions)
-    state['route'] = result
     actions[result]()
 
 
+logout()
 return_to_main_menu()
