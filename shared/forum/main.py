@@ -102,7 +102,7 @@ def print_branch():
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
     print(len(contents))
     for i in range(len(contents)):
-        if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])) and len(os.listdir(os.path.join(os.getcwd(), 'branches', contents[i]))):
+        if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])) and len(os.listdir(os.path.join(os.getcwd(), 'branches', contents[i])))==1:
             with open(os.path.join(os.getcwd(), 'branches', contents[i], 'themes.json'), encoding="utf-8") as file:
                 data = json.load(file)
             state["branch"][count] = contents[i]
