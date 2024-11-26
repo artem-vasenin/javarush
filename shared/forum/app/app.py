@@ -3,7 +3,10 @@ import json
 
 
 def clear_state() -> None:
-    os.remove(os.path.join(os.getcwd(), "app", "app.json"))
+    try:
+        os.remove(os.path.join(os.getcwd(), "app", "app.json"))
+    except FileNotFoundError:
+        pass
 
 
 def get_state() -> dict:
