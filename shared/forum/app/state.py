@@ -17,4 +17,7 @@ class State:
     def get_branch(self):
         return self.state["branch"]
 
+    def logout_user(self):
+        self.state["user"] = {}
+
 state = State()

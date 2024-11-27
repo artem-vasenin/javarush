@@ -70,7 +70,7 @@ def finish_program():
 
 def logout():
     """ Функция очищающая сессию пользователя после выхода. """
-    status.statu.logout_user()
+    state.state.logout()
     return_to_main_menu()
 
 
