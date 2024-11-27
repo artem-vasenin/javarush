@@ -22,7 +22,6 @@ def get_branches_from_db() -> tuple[dict, str]:
 
 def print_branch():
     """ Функция печатающая меню бранчей """
-    """ Функция печатающая меню бранчей """
     count = 1
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
     try:
@@ -72,7 +71,7 @@ def check_menu_branch(select, count):
             # return_to_main_menu()
             module = __import__("shared.forum.main")
             module.return_to_main_menu()
-            break
+
         else:
             select = input("Выберите корректный пункт меню: ")
 
