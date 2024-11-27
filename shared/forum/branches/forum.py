@@ -9,8 +9,8 @@ from shared.forum.utils.utils import print_list_decorator as print_d
 def get_branches_from_db() -> tuple[dict, str]:
     """ Функция получающая содержание текущей ветки. При успехе возвращает словарь
     при неудаче возвращает пустой словарь и ошибку"""
-    # st = app.get_state()
-    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', status.statu.stat["branch"], )) if '.json' in f]
+    st = app.get_state()
+    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', st.get("branch"), )) if '.json' in f]
     data = {}
 
     if not len(users_db):
@@ -34,7 +34,10 @@ def print_branch():
         print(f"{count}. {dirs[i]}")
         dct[count] = dirs[i]
         count += 1
-    app.save_state('branch', dct)
+    status.statu.status_branch(dct)
+
+    print("_"*40)
+    print(f"{count}. Назад")
 
     if status.statu.stat["user"] and status.statu.stat["user"]["role"] == "admin":
         print("_"*40)
@@ -60,6 +63,7 @@ def check_menu_branch(select, count):
             if branch.get(select):
                 theme = branch[select]
                 status.statu.status_branch(theme)
+                print( status.statu.stat["branch"])
                 listing_themes()
             else:
                 print('Ошибка получения темы')
