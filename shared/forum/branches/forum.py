@@ -70,6 +70,8 @@ def check_menu_branch(select, count):
         elif select.isdigit() and int(select)==count:
             # надо подумать как вызывать главное меню. Наверное меню тоже надо в модуль вынести
             # return_to_main_menu()
+            module = __import__("shared.forum.main")
+            module.return_to_main_menu()
             break
         else:
             select = input("Выберите корректный пункт меню: ")

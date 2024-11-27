@@ -69,7 +69,9 @@ def finish_program():
 
 def logout():
     """ Функция очищающая сессию пользователя после выхода. """
-    pass
+    status.statu.logout_user()
+    return_to_main_menu()
+
 
 
 def choose_action():
@@ -91,5 +93,5 @@ def choose_action():
     actions[result]()
 
 
-logout()
+
 return_to_main_menu()

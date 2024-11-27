@@ -10,4 +10,8 @@ class Status:
     def status_branch(self, branch, count):
         self.stat["branch"][count] = branch
 
+    def logout_user(self):
+        self.stat["user"] = {}
+
+
 statu = Status()
