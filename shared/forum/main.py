@@ -2,22 +2,17 @@ import app.app as app
 import users.user as user
 import branches.forum as forum
 import messages.message as messages
-import shared.forum.classs as classs
-import shared.forum.users.test as test
+import shared.forum.app.status as status
 
-
-test.reg()
-print(classs.statu.stat)
 
 def print_menu() -> None:
     """ Главное меню приложения """
-    st = app.get_state()
     menu_options = {
         1: 'Просмотр списка пользователей',
         2: 'Просмотр веток форума',
         3: 'Личные сообщения',
         4: 'Выход'
-    } if st.get('user') else {
+    } if status.statu.stat['user'] else {
         1: 'Регистрация',
         2: 'Аутентификация',
         3: 'Просмотр веток форума',
@@ -26,11 +21,11 @@ def print_menu() -> None:
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
 
-    if st.get('user'):
-        msgs, err = messages.get_pers_msgs(st['user']['login'])
+    if status.statu.stat['user']:
+        msgs, err = messages.get_pers_msgs(status.statu.stat['user']['login'])
         if not err:
-            not_read = list(filter(lambda x: not x['was_read'], msgs[st['user']['login']]))
-            print(f'У вас новых сообщений {len(not_read)}. Всего {len(msgs[st['user']['login']])}.')
+            not_read = list(filter(lambda x: not x['was_read'], msgs[status.statu.stat['user']['login']]))
+            print(f'У вас новых сообщений {len(not_read)}. Всего {len(msgs[status.statu.stat['user']['login']])}.')
 
 
 def return_to_main_menu():
@@ -80,13 +75,12 @@ def logout():
 
 def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
-    st = app.get_state()
     actions = {
         1: print_users_controller,
         2: listing_branch_controller,
         3: personal_messages_controller,
         4: logout,
-    } if st.get('user') else {
+    } if status.statu.stat['user'] else {
         1: register_controller,
         2: authentication_controller,
         3: listing_branch_controller,

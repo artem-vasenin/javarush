@@ -6,6 +6,7 @@ from datetime import datetime
 
 import shared.forum.app.app as app
 import shared.forum.utils.utils as ut
+import shared.forum.app.status as status
 
 
 def get_users_from_db() -> tuple[dict, str]:
@@ -129,7 +130,7 @@ def authentication() -> None:
         else:
             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
 
-    app.save_state('user', {'login': login, 'role': data['role']})
+    status.statu.status_registration(login, data['role'])
 
 
 @ut.print_list_decorator()
