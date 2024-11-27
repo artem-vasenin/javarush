@@ -1,17 +1,18 @@
 import users.user as user
 import branches.forum as forum
 import messages.message as messages
-import shared.forum.app.status as status
+import shared.forum.app.state as state
 
 
 def print_menu() -> None:
     """ Главное меню приложения """
+    usr = state.state.get_user()
     menu_options = {
         1: 'Просмотр списка пользователей',
         2: 'Просмотр веток форума',
         3: 'Личные сообщения',
         4: 'Выход'
-    } if status.statu.stat['user'] else {
+    } if usr else {
         1: 'Регистрация',
         2: 'Аутентификация',
         3: 'Просмотр веток форума',
@@ -20,11 +21,11 @@ def print_menu() -> None:
     for key, value in menu_options.items():
         print(f'{key} ---- {value}')
 
-    if status.statu.stat['user']:
-        msgs, err = messages.get_pers_msgs(status.statu.stat['user']['login'])
+    if usr:
+        msgs, err = messages.get_pers_msgs(usr['login'])
         if not err:
-            not_read = list(filter(lambda x: not x['was_read'], msgs[status.statu.stat['user']['login']]))
-            print(f'У вас новых сообщений {len(not_read)}. Всего {len(msgs[status.statu.stat['user']['login']])}.')
+            not_read = list(filter(lambda x: not x['was_read'], msgs[usr['login']]))
+            print(f'У вас новых сообщений {len(not_read)}. Всего {len(msgs[usr['login']])}.')
 
 
 def return_to_main_menu():
@@ -74,12 +75,13 @@ def logout():
 
 def choose_action():
     """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
+    usr = state.state.get_user()
     actions = {
         1: print_users_controller,
         2: listing_branch_controller,
         3: personal_messages_controller,
         4: logout,
-    } if status.statu.stat['user'] else {
+    } if usr else {
         1: register_controller,
         2: authentication_controller,
         3: listing_branch_controller,
