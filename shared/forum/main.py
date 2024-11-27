@@ -2,7 +2,12 @@ import app.app as app
 import users.user as user
 import branches.forum as forum
 import messages.message as messages
+import shared.forum.classs as classs
+import shared.forum.users.test as test
 
+
+test.reg()
+print(classs.statu.stat)
 
 def print_menu() -> None:
     """ Главное меню приложения """
