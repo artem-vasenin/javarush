@@ -1,5 +1,5 @@
-import users.user as user
 import app.app as app
+import users.user as user
 import branches.forum as forum
 import messages.message as messages
 
@@ -61,25 +61,11 @@ def listing_branch_controller():
 
 
 def personal_messages_controller():
+    """ Функция контроллер вызова меню личных сообщений """
     messages.personal_messages(return_to_main_menu)
 
-
-def bot():
-    pass
-
-def block_users():
-    pass
-
-def unblock_users():
-    pass
-
-def delete_users():
-    pass
-
-def hacker():
-    pass
-
 def finish_program():
+    """ Функция завершения раюоты приложения """
     pass
 
 def logout():

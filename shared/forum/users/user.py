@@ -1,7 +1,7 @@
-import os.path
-import json
 import re
+import json
 import hashlib
+import os.path
 from datetime import datetime
 
 import shared.forum.app.app as app
@@ -146,3 +146,19 @@ def print_users() -> list[str]:
             lst.append(f'login: {u["login"]} | role: {u["role"]} | registered: {u["created_at"]}{blocked}')
 
         return lst
+
+
+def bot():
+    pass
+
+def block_users():
+    pass
+
+def unblock_users():
+    pass
+
+def delete_users():
+    pass
+
+def hacker():
+    pass

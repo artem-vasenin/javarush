@@ -3,8 +3,8 @@ import json
 from datetime import datetime
 
 import shared.forum.app.app as app
-import shared.forum.users.user as user
 import shared.forum.utils.utils as ut
+import shared.forum.users.user as user
 
 
 def get_pers_msgs(login: str = '') -> tuple[dict, str]:

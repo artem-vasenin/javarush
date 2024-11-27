@@ -64,6 +64,7 @@ def check_menu_branch(select, count):
                 print('Ошибка получения темы')
             break
         elif select.isdigit() and int(select)==count:
+            # надо подумать как вызывать главное меню. Наверное меню тоже надо в модуль вынести
             # return_to_main_menu()
             break
         else:
