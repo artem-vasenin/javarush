@@ -1,7 +1,6 @@
 import os
 import json
 
-import shared.forum.app.app as app
 import shared.forum.app.status as status
 from shared.forum.utils.utils import print_list_decorator as print_d
 
@@ -9,14 +8,13 @@ from shared.forum.utils.utils import print_list_decorator as print_d
 def get_branches_from_db() -> tuple[dict, str]:
     """ Функция получающая содержание текущей ветки. При успехе возвращает словарь
     при неудаче возвращает пустой словарь и ошибку"""
-    st = app.get_state()
-    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', st.get("branch"), )) if '.json' in f]
+    users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', status.statu.stat["branch"][0], )) if '.json' in f]
     data = {}
 
     if not len(users_db):
         return data, 'База данных не найдена'
 
-    with open(os.path.join(os.getcwd(), 'branches', status.statu.stat["branch"], 'themes.json'), encoding="utf-8") as file:
+    with open(os.path.join(os.getcwd(), 'branches', status.statu.stat["branch"][0], 'themes.json'), encoding="utf-8") as file:
         data = json.load(file)
 
     return (data, '') if data["branch_name"]["themes"] else (data, 'Список тем пуст')
@@ -24,23 +22,23 @@ def get_branches_from_db() -> tuple[dict, str]:
 
 def print_branch():
     """ Функция печатающая меню бранчей """
-    # st = app.get_state()
-    url = os.path.join(os.getcwd(), 'branches')
+    """ Функция печатающая меню бранчей """
     count = 1
-    dirs = [entry.name for entry in os.scandir(url) if (entry.is_dir() and entry.name != '__pycache__')]
-    dct = {}
-
-    for i in range(len(dirs)):
-        print(f"{count}. {dirs[i]}")
-        dct[count] = dirs[i]
-        count += 1
-    status.statu.status_branch(dct)
-
-    print("_"*40)
+    contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
+    try:
+        for i in range(len(contents)):
+            if os.path.isdir(os.path.join(os.getcwd(), 'branches', contents[i])):
+                with open(os.path.join(os.getcwd(), 'branches', contents[i], 'themes.json'), encoding="utf-8") as file:
+                    data = json.load(file)
+                status.statu.status_branch(contents[i], count)
+                print(f"{count}. {data["branch_name"]["title"]}")
+                count += 1
+    except FileNotFoundError:
+        print("", end="")
+    print("__________________________")
     print(f"{count}. Назад")
-
-    if status.statu.stat["user"] and status.statu.stat["user"]["role"] == "admin":
-        print("_"*40)
+    if status.statu.stat['user'] and status.statu.stat['user']["role"] == "admin":
+        print("__________________________")
         print(f"{count + 1}. Добавить новую ветку\n{count + 2}. Удалить действующую ветку")
     return count
 
@@ -58,11 +56,12 @@ def check_menu_branch(select, count):
             delete_branches()
             break
         elif status.statu.stat["branch"] and select.isdigit() and 0<int(select)<count:
-            branch = status.statu.stat["branch"]
+            branch = status.statu.stat["branch"][int(select)]
+            status.statu.status_branch(branch, 0)
 
-            if branch.get(select):
-                theme = branch[select]
-                status.statu.status_branch(theme)
+            if status.statu.stat["branch"][int(select)-1]:
+                theme = status.statu.stat["branch"][int(select)-1]
+                status.statu.status_branch(theme, 0)
                 print( status.statu.stat["branch"])
                 listing_themes()
             else:

@@ -1,4 +1,3 @@
-import app.app as app
 import users.user as user
 import branches.forum as forum
 import messages.message as messages
@@ -70,7 +69,7 @@ def finish_program():
 
 def logout():
     """ Функция очищающая сессию пользователя после выхода. """
-    app.clear_state()
+    pass
 
 
 def choose_action():

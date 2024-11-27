@@ -2,9 +2,9 @@ import os
 import json
 from datetime import datetime
 
-import shared.forum.app.app as app
 import shared.forum.utils.utils as ut
 import shared.forum.users.user as user
+import shared.forum.app.status as status
 
 
 def get_pers_msgs(login: str = '') -> tuple[dict, str]:
@@ -25,11 +25,10 @@ def get_pers_msgs(login: str = '') -> tuple[dict, str]:
 
 def save_personal_msg_to_db(login: str, msg: str)-> tuple[str, str]:
     """ Сохранение нового сообщения для пользователя в базу данных """
-    st = app.get_state()
     msgs, msgs_err = get_pers_msgs()
 
     item = {
-        'from': st['user']['login'],
+        'from': status.statu.stat['user']['login'],
         'message': msg,
         'was_read': False,
         'was_answered': False,
@@ -76,16 +75,14 @@ def print_pers_msgs(lst: list, err) -> list[str]:
 
 def show_all_pers_messages():
     """ Функция печатающая все личные сообщения пользователя """
-    st = app.get_state()
-    data, err = get_pers_msgs(st['user']['login'])
-    print_pers_msgs(data[st['user']['login']] if not err else [], err)
+    data, err = get_pers_msgs(status.statu.stat['user']['login'])
+    print_pers_msgs(data[status.statu.stat['user']['login']] if not err else [], err)
 
 
 def show_new_pers_messages():
     """ Функция печатающая новые личные сообщения пользователя """
-    st = app.get_state()
-    data, err = get_pers_msgs(st['user']['login'])
-    print_pers_msgs(list(filter(lambda x: not x['was_read'], data[st['user']['login']])) if not err else [], err)
+    data, err = get_pers_msgs(status.statu.stat['user']['login'])
+    print_pers_msgs(list(filter(lambda x: not x['was_read'], data[status.statu.stat['user']['login']])) if not err else [], err)
 
 
 def personal_messages(cb):

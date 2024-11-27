@@ -4,7 +4,6 @@ import hashlib
 import os.path
 from datetime import datetime
 
-import shared.forum.app.app as app
 import shared.forum.utils.utils as ut
 import shared.forum.app.status as status
 
