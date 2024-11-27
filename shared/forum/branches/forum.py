@@ -23,7 +23,6 @@ def get_branches_from_db() -> tuple[dict, str]:
 
 def print_branch():
     """ Функция печатающая меню бранчей """
-    """ Функция печатающая меню бранчей """
     count = 1
     contents = os.listdir(os.path.join(os.getcwd(), 'branches'))
     usr = state.state.get_user()
