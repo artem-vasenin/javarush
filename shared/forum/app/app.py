@@ -3,6 +3,7 @@ import json
 
 
 def clear_state() -> None:
+    """ Функция удаляющая файл состояния (при первом запуске и при выходе пользователя) """
     try:
         os.remove(os.path.join(os.getcwd(), "app", "app.json"))
     except FileNotFoundError:
@@ -10,6 +11,7 @@ def clear_state() -> None:
 
 
 def get_state() -> dict:
+    """ Функция получающая наше состояние (если файл еще не создан вернем пустой словарь) """
     try:
         with open(os.path.join(os.getcwd(), "app", "app.json"), encoding="utf-8") as file:
             return json.load(file)
@@ -18,6 +20,7 @@ def get_state() -> dict:
 
 
 def save_state(key: str = '', value = None) -> None:
+    """ Функция записывающая данные в состояние по ключу с передачей значения """
     data = get_state()
 
     if key and value:
