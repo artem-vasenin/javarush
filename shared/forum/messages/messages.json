@@ -1,0 +1,18 @@
+{
+  "Lena": [
+    {
+      "from": "Lena",
+      "message": "Привет",
+      "was_read": false,
+      "was_answered": false,
+      "created_at": "2024-11-27 12:34:45"
+    },
+    {
+      "from": "Lena",
+      "message": "Привет! как дела?",
+      "was_read": false,
+      "was_answered": false,
+      "created_at": "2024-11-27 20:52:25"
+    }
+  ]
+}
