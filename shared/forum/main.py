@@ -94,4 +94,5 @@ def choose_action():
 
 
 
-return_to_main_menu()
+if __name__ == "__main__":
+    return_to_main_menu()
