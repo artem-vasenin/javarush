@@ -122,13 +122,6 @@ def print_users_controller():
     us.print_users()
 
 
-# def listing_branch_controller():
-#     """ Функция контроллер для меню веток форума """
-#
-#     count = forum.print_branch()
-#     select = input("Выберите пункт меню: ")
-#     forum.check_menu_branch(select, count)
-
 
 def personal_messages_controller():
     from shared.forum.main import beginning

@@ -170,67 +170,6 @@ def crypt_password(password) -> str:
     return hashlib.md5(password.encode()).hexdigest()
 
 
-# def register():
-#     """ Функция регистрации нового пользователя """
-#     role = 'user'
-#     login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
-#     check, err = check_login(login)
-#     if not check:
-#         print(err)
-#         register()
-#         return
-#
-#     password = input("Введите Ваш пароль: ")
-#     while not check_password(password):
-#         password = input("Пароль не безопасный, введите другой: ")
-#
-#     hash_password = crypt_password(password)
-#     """ По запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя:
-#     "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно """
-#     secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
-#     if secretkey == "аз есмь царь!":
-#         role = 'admin'
-#
-#     user = {
-#         'login': login,
-#         'passhash': hash_password,
-#         'role': role,
-#         'blocked_at': '',
-#         'blocked_reason': '',
-#         'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-#         'name': '',
-#         'city': '',
-#     }
-#     save_user_to_db(user)
-
-
-# def authentication() -> None:
-#     """
-#     Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
-#     В случае совпадения возвращает True
-#     В случае отсутствия пользователя в базе выводит информацию на экран
-#     В случае несовпадения хеша пароля выводит информацию на экран
-#     Обращаю внимание, что текст ошибки должен быть идентичен, чтобы хакер не смог перебирать имена пользователей
-#     """
-#     flag = False
-#     login = None
-#     data = None
-#     while not flag:
-#         login = input("Введите имя пользователя: ")
-#         data, err = get_user_by_login(login)
-#         password = input("Введите пароль пользователя: ")
-#         if data and not err:
-#             if data['passhash'] == crypt_password(password):
-#                 print('Аутентификация прошла успешно')
-#                 flag = True
-#             else:
-#                 print('Неверное имя пользователя или пароль')
-#         else:
-#             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
-#
-#     state.state.set_user(login, data['role'])
-
-
 @ut.print_list_decorator()
 def print_users() -> list[str]:
     """ Функция запрашивающая список пользователей и выводящая его на печать. Когда будет присвоение ролей надо ее дописать """
