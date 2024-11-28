@@ -1,7 +1,7 @@
 import users.user as user
 import branches.forum as forum
 import messages.message as messages
-import shared.forum.app.state as state
+import shared.forum_v1.app.state as state
 
 
 def print_menu() -> None:

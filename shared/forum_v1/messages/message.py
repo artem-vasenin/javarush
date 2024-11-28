@@ -2,9 +2,9 @@ import os
 import json
 from datetime import datetime
 
-import shared.forum.utils.utils as ut
-import shared.forum.users.user as user
-import shared.forum.app.state as state
+import shared.forum_v1.utils.utils as ut
+import shared.forum_v1.users.user as user
+import shared.forum_v1.app.state as state
 
 
 def get_pers_msgs(login: str = '') -> tuple[dict, str]:

@@ -4,8 +4,8 @@ import hashlib
 import os.path
 from datetime import datetime
 
-import shared.forum.utils.utils as ut
-import shared.forum.app.state as state
+import shared.forum_v1.utils.utils as ut
+import shared.forum_v1.app.state as state
 
 
 def get_users_from_db() -> tuple[dict, str]:

@@ -1,8 +1,8 @@
 import os
 import json
 
-import shared.forum.app.state as state
-from shared.forum.utils.utils import print_list_decorator as print_d
+import shared.forum_v1.app.state as state
+from shared.forum_v1.utils.utils import print_list_decorator as print_d
 
 
 def get_branches_from_db() -> tuple[dict, str]:
@@ -72,7 +72,7 @@ def check_menu_branch(select, count):
         elif select.isdigit() and int(select)==count:
             # надо подумать как вызывать главное меню. Наверное меню тоже надо в модуль вынести
             # return_to_main_menu()
-            from shared.forum.main import return_to_main_menu
+            from shared.forum_v1.main import return_to_main_menu
             return_to_main_menu()
             return
 
