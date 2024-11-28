@@ -34,7 +34,6 @@ class Beginning:
     def print_menu(self):
         from shared.forum.users.user import User
         from shared.forum.main import beginning
-        print(beginning.list_guest)
         if type(beginning.list_guest)==Guest:
             for key, value in self.menu_guest.items():
                 print(f'{key} ---- {value}')
@@ -48,7 +47,6 @@ class Beginning:
     def choose_action(self):
         """ Функция контроллер приложения. Пользователь выбирает параметр по которому происходит роутинг """
         from shared.forum.main import beginning
-        print(beginning.list_guest)
         if type(beginning.list_guest) == Guest:
             actions = {
                 1: beginning.list_guest.register_controller,
@@ -77,7 +75,6 @@ class Beginning:
             try:
                 select = input("Выберите пункт меню: ")
                 result = int(select)
-                print(actions)
                 actions[result]()
                 return
             except KeyError:
@@ -107,14 +104,6 @@ class Beginning:
 
         with open(os.path.join(os.getcwd(), "users", "users.json"), 'w', encoding="utf-8") as file:
             json.dump(data, file, indent=2, ensure_ascii=False)
-
-
-
-# def return_to_main_menu():
-#     """ Функция возвращающая главное меню и выбор его пункта """
-#     users = guest.authentication()
-#     beginning.print_menu(users)
-#     beginning.choose_action(users)
 
 
 def print_users_controller():

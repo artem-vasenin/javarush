@@ -1,7 +1,6 @@
 import os
 import json
 
-import shared.forum.app.state as state
 from shared.forum.utils.utils import print_list_decorator as print_d
 
 class Branch:

@@ -4,7 +4,6 @@ from datetime import datetime
 
 import shared.forum.utils.utils as ut
 import shared.forum.users.user as user
-import shared.forum.app.state as state
 
 
 def get_pers_msgs(login: str = '') -> tuple[dict, str]:
@@ -24,12 +23,12 @@ def get_pers_msgs(login: str = '') -> tuple[dict, str]:
 
 
 def save_personal_msg_to_db(login: str, msg: str)-> tuple[str, str]:
+    from shared.forum.main import beginning
     """ Сохранение нового сообщения для пользователя в базу данных """
     msgs, msgs_err = get_pers_msgs()
-    usr = state.state.get_user()
 
     item = {
-        'from': usr['login'],
+        'from': beginning.list_guest.name,
         'message': msg,
         'was_read': False,
         'was_answered': False,
@@ -75,17 +74,17 @@ def print_pers_msgs(lst: list, err) -> list[str]:
 
 
 def show_all_pers_messages():
+    from shared.forum.main import beginning
     """ Функция печатающая все личные сообщения пользователя """
-    usr = state.state.get_user()
-    data, err = get_pers_msgs(usr['login'])
-    print_pers_msgs(data[usr['login']] if not err else [], err)
+    data, err = get_pers_msgs(beginning.list_guest.name)
+    print_pers_msgs(data[beginning.list_guest.name] if not err else [], err)
 
 
 def show_new_pers_messages():
+    from shared.forum.main import branch, beginning
     """ Функция печатающая новые личные сообщения пользователя """
-    usr = state.state.get_user()
-    data, err = get_pers_msgs(usr['login'])
-    print_pers_msgs(list(filter(lambda x: not x['was_read'], data[usr['login']])) if not err else [], err)
+    data, err = get_pers_msgs(beginning.list_guest.name)
+    print_pers_msgs(list(filter(lambda x: not x['was_read'], data[beginning.list_guest.name])) if not err else [], err)
 
 
 def personal_messages(cb):
