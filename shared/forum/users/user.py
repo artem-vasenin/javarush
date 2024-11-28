@@ -5,7 +5,108 @@ import os.path
 from datetime import datetime
 
 import shared.forum.utils.utils as ut
-import shared.forum.app.state as state
+
+
+
+class Guest:
+    def __init__(self):
+        pass
+
+    def register(self):
+        from shared.forum.main import beginning
+        """ Функция регистрации нового пользователя """
+        role = 'user'
+        login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
+        check, err = check_login(login)
+        if not check:
+            print(err)
+            guest.register()
+            return
+
+        password = input("Введите Ваш пароль: ")
+        while not check_password(password):
+            password = input("Пароль не безопасный, введите другой: ")
+
+        hash_password = crypt_password(password)
+        """ По запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
+        "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно """
+        secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
+        if secretkey == "аз есмь царь!":
+            role = 'admin'
+
+        user = {
+            'login': login,
+            'passhash': hash_password,
+            'role': role,
+            'blocked_at': '',
+            'blocked_reason': '',
+            'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            'name': '',
+            'city': '',
+        }
+        save_user_to_db(user)
+        if role == 'admin':
+            beginning.list_guest = Admin()
+        else:
+            beginning.list_guest = User()
+        print(beginning.list_guest)
+
+
+    def register_controller(self):
+        """ Вызов функции регистрации пользователя """
+        from shared.forum.main import beginning
+        beginning.list_guest.register()
+        beginning.print_menu(guest)
+        beginning.choose_action(guest)
+
+    def authentication(self) -> None:
+        from shared.forum.main import beginning
+        """
+        Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
+        В случае совпадения возвращает True
+        В случае отсутствия пользователя в базе выводит информацию на экран
+        В случае несовпадения хеша пароля выводит информацию на экран
+        Обращаю внимание, что текст ошибки должен быть идентичен, чтобы хакер не смог перебирать имена пользователей
+        """
+        flag = False
+        login = None
+        data = None
+        while not flag:
+            login = input("Введите имя пользователя: ")
+            data, err = get_user_by_login(login)
+            password = input("Введите пароль пользователя: ")
+            if data and not err:
+                if data['passhash'] == crypt_password(password):
+                    print('Аутентификация прошла успешно')
+                    flag = True
+                else:
+                    print('Неверное имя пользователя или пароль')
+            else:
+                print('Неверное имя пользователя или пароль') # Текст ошибки должен быть идентичен
+        if data['role']=='admin':
+            beginning.list_guest = Admin(login)
+        else:beginning.list_guest = User(login)
+
+
+    def authentication_controller(self):
+        """ Вызов функции входа в приложение """
+        global guest
+        from shared.forum.main import beginning
+        beginning.list_guest.authentication()
+        print(beginning.list_guest)
+        beginning.print_menu()
+        beginning.choose_action()
+
+
+class User(Guest):
+    def __init__(self, name):
+        self.name = name
+        condition = {}
+
+class Admin(User):
+    def __init__(self, name):
+        self.name = name
+        condition = {}
 
 
 def get_users_from_db() -> tuple[dict, str]:
@@ -38,14 +139,12 @@ def get_user_by_login(login: str) -> tuple[dict, str]:
 def save_user_to_db(user: dict) -> None:
     """ Функция записи пользователя в базу данных """
     data, error = get_users_from_db()
-
     if error and not data:
         data['users'] = [user]
         data['len'] = 1
     else:
         data['users'].append(user)
         data['len'] = len(data['users'])
-
     with open(os.path.join(os.getcwd(), "users", "users.json"), 'w', encoding="utf-8") as file:
         json.dump(data, file, indent=2, ensure_ascii=False)
 
@@ -71,65 +170,65 @@ def crypt_password(password) -> str:
     return hashlib.md5(password.encode()).hexdigest()
 
 
-def register():
-    """ Функция регистрации нового пользователя """
-    role = 'user'
-    login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
-    check, err = check_login(login)
-    if not check:
-        print(err)
-        register()
-        return
+# def register():
+#     """ Функция регистрации нового пользователя """
+#     role = 'user'
+#     login = input("Введите Ваш логин (только латинские буквы в нижнем регистре и цифры): ").strip()
+#     check, err = check_login(login)
+#     if not check:
+#         print(err)
+#         register()
+#         return
+#
+#     password = input("Введите Ваш пароль: ")
+#     while not check_password(password):
+#         password = input("Пароль не безопасный, введите другой: ")
+#
+#     hash_password = crypt_password(password)
+#     """ По запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя:
+#     "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно """
+#     secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
+#     if secretkey == "аз есмь царь!":
+#         role = 'admin'
+#
+#     user = {
+#         'login': login,
+#         'passhash': hash_password,
+#         'role': role,
+#         'blocked_at': '',
+#         'blocked_reason': '',
+#         'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+#         'name': '',
+#         'city': '',
+#     }
+#     save_user_to_db(user)
 
-    password = input("Введите Ваш пароль: ")
-    while not check_password(password):
-        password = input("Пароль не безопасный, введите другой: ")
 
-    hash_password = crypt_password(password)
-    """ По запросу секретного ключа, если он не верный (не найден среди действующих), может запрашивать у пользователя: 
-    "Вы хотите зарегистрироваться как обычный пользователь или админ?" если админ, то просит ввести ключ повторно """
-    secretkey = input("Введите секретный ключ (для привилегированных пользователей): ")
-    if secretkey == "аз есмь царь!":
-        role = 'admin'
-
-    user = {
-        'login': login,
-        'passhash': hash_password,
-        'role': role,
-        'blocked_at': '',
-        'blocked_reason': '',
-        'created_at': datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-        'name': '',
-        'city': '',
-    }
-    save_user_to_db(user)
-
-
-def authentication() -> None:
-    """
-    Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
-    В случае совпадения возвращает True
-    В случае отсутствия пользователя в базе выводит информацию на экран
-    В случае несовпадения хеша пароля выводит информацию на экран
-    Обращаю внимание, что текст ошибки должен быть идентичен, чтобы хакер не смог перебирать имена пользователей
-    """
-    flag = False
-    login = None
-    data = None
-    while not flag:
-        login = input("Введите имя пользователя: ")
-        data, err = get_user_by_login(login)
-        password = input("Введите пароль пользователя: ")
-        if data and not err:
-            if data['passhash'] == crypt_password(password):
-                print('Аутентификация прошла успешно')
-                flag = True
-            else:
-                print('Неверное имя пользователя или пароль')
-        else:
-            print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
-
-    state.state.set_user(login, data['role'])
+# def authentication() -> None:
+#     """
+#     Функция проверяет наличие логина и соответствие ему хеша пароля пользователя
+#     В случае совпадения возвращает True
+#     В случае отсутствия пользователя в базе выводит информацию на экран
+#     В случае несовпадения хеша пароля выводит информацию на экран
+#     Обращаю внимание, что текст ошибки должен быть идентичен, чтобы хакер не смог перебирать имена пользователей
+#     """
+#     flag = False
+#     login = None
+#     data = None
+#     while not flag:
+#         login = input("Введите имя пользователя: ")
+#         data, err = get_user_by_login(login)
+#         password = input("Введите пароль пользователя: ")
+#         if data and not err:
+#             if data['passhash'] == crypt_password(password):
+#                 print('Аутентификация прошла успешно')
+#                 flag = True
+#             else:
+#                 print('Неверное имя пользователя или пароль')
+#         else:
+#             print('Неверное имя пользователя или пароль') #Текст ошибки должен быть идентичен
+#
+#     state.state.set_user(login, data['role'])
 
 
 @ut.print_list_decorator()
