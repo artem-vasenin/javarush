@@ -20,7 +20,7 @@ class Guest:
         check, err = check_login(login)
         if not check:
             print(err)
-            guest.register()
+            beginning.list_guest.register()
             return
 
         password = input("Введите Ваш пароль: ")
@@ -44,20 +44,16 @@ class Guest:
             'name': '',
             'city': '',
         }
+        print("_"*40+"\nВы успешно зарегистрировались на форуме.\n"+"_"*40)
         save_user_to_db(user)
-        if role == 'admin':
-            beginning.list_guest = Admin()
-        else:
-            beginning.list_guest = User()
-        print(beginning.list_guest)
 
 
     def register_controller(self):
         """ Вызов функции регистрации пользователя """
         from shared.forum.main import beginning
         beginning.list_guest.register()
-        beginning.print_menu(guest)
-        beginning.choose_action(guest)
+        beginning.print_menu()
+        beginning.choose_action()
 
     def authentication(self) -> None:
         from shared.forum.main import beginning
@@ -77,7 +73,6 @@ class Guest:
             password = input("Введите пароль пользователя: ")
             if data and not err:
                 if data['passhash'] == crypt_password(password):
-                    print('Аутентификация прошла успешно')
                     flag = True
                 else:
                     print('Неверное имя пользователя или пароль')
@@ -85,7 +80,9 @@ class Guest:
                 print('Неверное имя пользователя или пароль') # Текст ошибки должен быть идентичен
         if data['role']=='admin':
             beginning.list_guest = Admin(login)
-        else:beginning.list_guest = User(login)
+        else:
+            beginning.list_guest = User(login)
+        print("_"*40+f"\n{login}, добро пожаловать на форум!\n"+"_"*40)
 
 
     def authentication_controller(self):
@@ -93,7 +90,6 @@ class Guest:
         global guest
         from shared.forum.main import beginning
         beginning.list_guest.authentication()
-        print(beginning.list_guest)
         beginning.print_menu()
         beginning.choose_action()
 
