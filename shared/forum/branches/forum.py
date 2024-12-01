@@ -13,13 +13,13 @@ class Branch:
         from shared.forum.main import branch
         """ Функция получающая содержание текущей ветки. При успехе возвращает словарь
         при неудаче возвращает пустой словарь и ошибку"""
-        users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', branch.branc, )) if '.json' in f]
+        users_db = [f for f in os.listdir(os.path.join(os.getcwd(), 'branches', self.branc, )) if '.json' in f]
         data = {}
 
         if not len(users_db):
             return data, 'База данных не найдена'
 
-        with open(os.path.join(os.getcwd(), 'branches', branch.branc, 'themes.json'), encoding="utf-8") as file:
+        with open(os.path.join(os.getcwd(), 'branches', self.branc, 'themes.json'), encoding="utf-8") as file:
             data = json.load(file)
 
         return (data, '') if data["branch_name"]["themes"] else (data, 'Список тем пуст')
@@ -65,12 +65,11 @@ def check_menu_branch(select, count):
             break
         elif branch.branches and select.isdigit() and 0<int(select)<count:
             branch.branc = branch.branches[int(select)]
-            listing_themes()
+            listing_themes_controller()
             break
 
         elif select.isdigit() and int(select)==count:
             from shared.forum.main import beginning
-            print(beginning.list_guest)
             beginning.return_to_main_menu()
             return
 
@@ -86,7 +85,6 @@ def listing_branch_controller():
     listing_themes_controller()
 
 
-@print_d()
 def listing_themes():
     from shared.forum.main import branch
     """ функция печатающая список тем в выбранной ветки """
@@ -97,7 +95,7 @@ def listing_themes():
         return [err]
     else:
         themes = data["branch_name"]["themes"]
-        return [f"{i+1}. {themes[i]["title_themes"]}" for i in range(len(themes))]+[f"{len(data)+2}. Назад"]
+        return [f"{i+1}. {themes[i]["title_themes"]}" for i in range(len(themes))]+["_"*20]+[f"{len(data)+2}. Назад"]
 
 
 def create_branch():
@@ -120,6 +118,6 @@ def print_themes(select):
 
 def listing_themes_controller():
     """ Функция контроллер для меню веток форума """
-    listing_themes()
+    print(*listing_themes(), sep="\n")
     select = input("Выберите пункт меню: ")
     print_themes(select)
